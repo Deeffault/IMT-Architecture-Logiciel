@@ -55,39 +55,6 @@ Deux options: utiliser Docker Desktop localement ou Docker via CI/serveur.
 - Spring Boot expose le service `app`, se connecte à `mongo` via `spring.data.mongodb.uri`.
 - Le service `app` est construit depuis le repo (présence d'un `Dockerfile`).
 
-```yaml
-version: "3.8"
-
-services:
-  mongo:
-    image: mongo:6
-    container_name: imt_mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: imtdb
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: imt_app
-    restart: on-failure
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/imtdb
-      - SPRING_DATA_MONGODB_DATABASE=imtdb
-    depends_on:
-      - mongo
-
-volumes:
-  mongo_data:
-```
-
 ## Démarrer les conteneurs
 
 1. Assurez-vous que Docker est installé et en cours d'exécution.
