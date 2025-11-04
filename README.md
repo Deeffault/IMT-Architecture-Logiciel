@@ -33,34 +33,115 @@ Le projet est organisé en trois couches principales :
 ### Structure conceptuelle
 
 ```
-com.imt.IMT_Architecture_Logiciel
+imt-architecture-logiciel/
 │
-├── ImtArchitectureLogicielApplication.java   // Point d'entrée Spring Boot
+├── domain/                                  # 🎯 Module Domain (Cœur métier, pur Java, SANS Spring)
+│   └── src/main/java/
+│       └── com.imt.IMT_Architecture_Logiciel.domain/
+│           ├── clients/
+│           │   ├── model/
+│           │   │   └── Client.java                      
+│           │   ├── port/in/
+│           │   │   └── CreerClientUseCase.java          ← PORT (Interface)
+│           │   ├── port/out/
+│           │   │   └── ClientRepository.java            ← PORT (Interface)
+│           │   ├── service/
+│           │   │   └── ClientService.java               ← Implémente CreerClientUseCase
+│           │   └── validator/
+│           │       └── ClientUniciteValidator.java      
+│           │
+│           ├── vehicules/
+│           │   ├── model/
+│           │   │   ├── Vehicule.java                  
+│           │   │   └── EtatVehicule.java              
+│           │   ├── port/in/
+│           │   │   ├── CreerVehiculeUseCase.java
+│           │   │   └── DeclarerVehiculeEnPanneUseCase.java 
+│           │   ├── port/out/
+│           │   │   └── VehiculeRepository.java
+│           │   ├── service/
+│           │   │   └── VehiculeService.java
+│           │   └── validator/
+│           │       └── VehiculeUniciteValidator.java    
+│           │
+│           ├── contrats/
+│           │   ├── model/
+│           │   │   ├── Contrat.java                   
+│           │   │   └── EtatContrat.java               
+│           │   ├── port/in/
+│           │   │   ├── CreerContratUseCase.java
+│           │   │   └── VerifierContratsEnRetardUseCase.java 
+│           │   ├── port/out/
+│           │   │   └── ContratRepository.java
+│           │   ├── service/
+│           │   │   ├── ContratService.java
+│           │   │   └── AnnulationContratDomaineService.java  ← Logique métier pure 
+│           │   └── validator/
+│           │       └── ContratValidationService.java    
+│           │
+│           └── common/
+│               └── exception/
+│                   ├── VehiculeEnPanneException.java
+│                   └── ClientNonUniqueException.java
 │
-├── domain                  // COUCHE DOMAINE (modèles, ports, exceptions)
-│   ├── model
-│   ├── port
-│   │   ├── in
-│   │   └── out
-│   └── exception
+├── adapters-in-rest/                        # 🔌 Module REST (Adaptateur primaire)
+│   └── src/main/java/
+│       └── com.imt.IMT_Architecture_Logiciel.rest/
+│           ├── clients/
+│           │   ├── ClientsController.java
+│           │   └── dto/
+│           │       ├── input/
+│           │       └── output/
+│           ├── vehicules/
+│           │   ├── VehiculesController.java
+│           │   └── dto/
+│           ├── contrats/
+│           │   ├── ContratsController.java
+│           │   └── dto/
+│           └── common/
+│               └── GlobalExceptionHandler.java
 │
-├── application             // COUCHE APPLICATION (commands, results, services)
-│   ├── command
-│   ├── result
-│   └── service
+├── adapters-in-scheduler/                   # 📡 Module Scheduler (Adaptateur primaire)
+│   └── src/main/java/
+│       └── com.imt.IMT_Architecture_Logiciel.scheduler/
+│           └── ContratScheduler.java        ← Appelle VerifierContratsEnRetardUseCase 
 │
-└── infrastructure          // COUCHE INFRASTRUCTURE (adapters, config)
-    ├── adapter
-    │   ├── in
-    │   │   ├── web
-    │   │   │   ├── dto
-    │   │   │   ├── mapper
-    │   │   │   └── controller
-    │   │   └── scheduler
-    │   └── out
-    │       └── persistence
-    │           └── mongodb
-    └── config
+├── adapters-out-bdd/                        # 💾 Module BDD (Adaptateur secondaire)
+│   └── src/main/java/
+│       └── com.imt.IMT_Architecture_Logiciel.bdd/
+│           ├── clients/
+│           │   ├── ClientMongoRepository.java     ← Implémente domain.port.out.ClientRepository
+│           │   ├── repository/
+│           │   │   └── ClientSpringDataRepository.java  (Interface extends MongoRepository)
+│           │   ├── entity/
+│           │   │   └── ClientDocument.java
+│           │   └── mapper/
+│           │       └── ClientBddMapper.java
+│           │
+│           ├── vehicules/
+│           │   ├── VehiculeMongoRepository.java   ← Implémente domain.port.out.VehiculeRepository
+│           │   ├── repository/
+│           │   │   └── VehiculeSpringDataRepository.java
+│           │   ├── entity/
+│           │   │   └── VehiculeDocument.java
+│           │   └── mapper/
+│           │       └── VehiculeBddMapper.java
+│           │
+│           └── contrats/
+│               ├── ContratMongoRepository.java    ← Implémente domain.port.out.ContratRepository
+│               ├── repository/
+│               │   └── ContratSpringDataRepository.java
+│               ├── entity/
+│               │   └── ContratDocument.java
+│               └── mapper/
+│                   └── ContratBddMapper.java
+│
+└── application/                             # 🚀 Module Application (Composition & Démarrage)
+    └── src/main/java/
+        └── com.imt.IMT_Architecture_Logiciel/
+            ├── ImtArchitectureLogicielApplication.java
+            └── config/
+                └── BeanConfiguration.java   ← Assemble tout (Injection de dépendances)
 ```
 
 ---
