@@ -11,6 +11,7 @@
     <groupId>com.imt</groupId>
     <artifactId>IMT-Architecture-Logiciel</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>IMT-Architecture-Logiciel</name>
     <description>Demo project for Spring Boot</description>
     <url/>
@@ -20,6 +21,13 @@
     <developers>
         <developer/>
     </developers>
+    <modules>
+        <module>domain</module>
+        <module>application</module>
+        <module>adapters-in-rest</module>
+        <module>adapters-in-scheduler</module>
+        <module>adapters-out-bdd</module>
+    </modules>
     <scm>
         <connection/>
         <developerConnection/>
