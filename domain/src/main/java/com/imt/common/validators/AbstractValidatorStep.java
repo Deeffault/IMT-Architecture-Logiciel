@@ -61,6 +61,4 @@ public abstract class AbstractValidatorStep<T> {
 
         return this;
     }
-
-    public abstract void check(Client)
 }

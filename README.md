@@ -7,7 +7,9 @@
 
 ## 📋 Description
 
-Projet Spring Boot de gestion de location automobile, réalisé dans le cadre du TP d'Architecture Logicielle à l'IMT. L'objectif est de mettre en œuvre une **Architecture Hexagonale (Ports & Adapters)** pour séparer clairement la logique métier des détails techniques et faciliter la testabilité.
+Projet Spring Boot de gestion de location automobile, réalisé dans le cadre du TP d'Architecture Logicielle à l'IMT.
+L'objectif est de mettre en œuvre une **Architecture Hexagonale (Ports & Adapters)** pour séparer clairement la logique
+métier des détails techniques et faciliter la testabilité.
 
 ## ✨ Fonctionnalités principales
 
@@ -15,9 +17,9 @@ Projet Spring Boot de gestion de location automobile, réalisé dans le cadre du
 - Gestion des véhicules : parc de véhicules (immatriculation, modèle, état — disponible, en location, en panne).
 - Gestion des contrats : création et suivi des contrats de location (liaison client ↔ véhicule).
 - Règles métier automatisées :
-  - Annulation automatique des contrats "en attente" si un véhicule est déclaré "en panne".
-  - Passage automatique des contrats en "retard" si le véhicule n'est pas restitué.
-  - Annulation des contrats futurs si un retard bloque une location suivante.
+    - Annulation automatique des contrats "en attente" si un véhicule est déclaré "en panne".
+    - Passage automatique des contrats en "retard" si le véhicule n'est pas restitué.
+    - Annulation des contrats futurs si un retard bloque une location suivante.
 - Validation des DTOs via `spring-boot-starter-validation`.
 
 ---
@@ -32,57 +34,50 @@ Le projet est organisé en trois couches principales :
 
 ### Structure conceptuelle
 
-```
+```plaintext
 imt-architecture-logiciel/
 │
 ├── domain/                                  # 🎯 Module Domain (Cœur métier, pur Java, SANS Spring)
 │   └── src/main/java/
-│       └── com.imt.IMT_Architecture_Logiciel.domain/
+│       └── com.imt/
 │           ├── clients/
 │           │   ├── model/
-│           │   │   └── Client.java                      
-│           │   ├── port/in/
-│           │   │   └── CreerClientUseCase.java          ← PORT (Interface)
-│           │   ├── port/out/
-│           │   │   └── ClientRepository.java            ← PORT (Interface)
-│           │   ├── service/
-│           │   │   └── ClientService.java               ← Implémente CreerClientUseCase
-│           │   └── validator/
-│           │       └── ClientUniciteValidator.java      
+│           │   │   └── Client.java                   (Le modèle métier pur, immuable)
+│           │   ├── validators/
+│           │   │   ├── ClientUnicityValidatorStep.java   (Règle: nom+prénom+date)
+│           │   │   └── ClientUnicityLicenseValidatorStep.java (Règle: numPermis unique)
+│           │   ├── ClientStorageProvider.java        (PORT DE SORTIE / Repository Interface)
+│           │   ├── ClientsService.java               (Service de base, CRUD)
+│           │   └── ClientsServiceValidator.java      (PORT D'ENTRÉE / Use Case + Validation)
 │           │
 │           ├── vehicules/
 │           │   ├── model/
 │           │   │   ├── Vehicule.java                  
 │           │   │   └── EtatVehicule.java              
-│           │   ├── port/in/
-│           │   │   ├── CreerVehiculeUseCase.java
-│           │   │   └── DeclarerVehiculeEnPanneUseCase.java 
 │           │   ├── port/out/
-│           │   │   └── VehiculeRepository.java
+│           │   │   └── VehiculeRepository.java        (PORT DE SORTIE)
 │           │   ├── service/
-│           │   │   └── VehiculeService.java
-│           │   └── validator/
-│           │       └── VehiculeUniciteValidator.java    
+│           │   │   └── VehiculeService.java           (PORT D'ENTRÉE)
+│           │   └── ...
 │           │
 │           ├── contrats/
 │           │   ├── model/
 │           │   │   ├── Contrat.java                   
 │           │   │   └── EtatContrat.java               
-│           │   ├── port/in/
-│           │   │   ├── CreerContratUseCase.java
-│           │   │   └── VerifierContratsEnRetardUseCase.java 
-│           │   ├── port/out/
-│           │   │   └── ContratRepository.java
 │           │   ├── service/
-│           │   │   ├── ContratService.java
-│           │   │   └── AnnulationContratDomaineService.java  ← Logique métier pure 
-│           │   └── validator/
-│           │       └── ContratValidationService.java    
+│           │   │   └── ContratService.java            (PORT D'ENTRÉE)
+│           │   └── ...
 │           │
 │           └── common/
-│               └── exception/
-│                   ├── VehiculeEnPanneException.java
-│                   └── ClientNonUniqueException.java
+│               ├── exceptions/
+│               │   ├── ImtException.java            (Exception de base)
+│               │   ├── BadRequestException.java     (Pour validation @Pattern)
+│               │   └── ConflictException.java       (Pour unicité)
+│               ├── model/
+│               │   └── ValidatorResult.java         (Résultat de la chaîne)
+│               └── validators/
+│                   ├── AbstractValidatorStep.java   (Base de la chaîne)
+│                   └── ConstraintValidatorStep.java (Validation des @NotNull, @Pattern)
 │
 ├── adapters-in-rest/                        # 🔌 Module REST (Adaptateur primaire)
 │   └── src/main/java/
@@ -197,7 +192,8 @@ L'application sera accessible par défaut sur : http://localhost:8080
 ## 🔧 Configuration & connexion à la base
 
 - Les propriétés Spring se trouvent dans `src/main/resources/application.properties`.
-- Le fichier `docker-compose.yml` définit un utilisateur/MDP pour MongoDB. Exemple d'URL de connexion (utilisé par l'application ou un client) :
+- Le fichier `docker-compose.yml` définit un utilisateur/MDP pour MongoDB. Exemple d'URL de connexion (utilisé par
+  l'application ou un client) :
 
 ```
 mongodb://user:pass@localhost:27017/carrentaldb?authSource=admin
@@ -212,6 +208,7 @@ Adaptez les identifiants selon votre configuration locale.
 Branche principale : `main`
 
 Branches de travail :
+
 - `feature/<descr>` — nouvelles fonctionnalités
 - `fix/<descr>` — corrections de bugs
 - `hotfix/<descr>` — corrections urgentes sur `main`
@@ -219,6 +216,7 @@ Branches de travail :
 - `release/<version>` — préparation de release
 
 Format de commit (Conventional Commits) :
+
 - `feat:` ajout d'une fonctionnalité
 - `fix:` correction d'un bug
 - `docs:` modifications de documentation
@@ -241,7 +239,8 @@ git push origin feature/ma-fonctionnalite
 
 ## 📚 Contribution
 
-Les contributions sont bienvenues : ouvrez une issue pour discuter d'une fonctionnalité, ou envoyez une pull request depuis une branche dédiée.
+Les contributions sont bienvenues : ouvrez une issue pour discuter d'une fonctionnalité, ou envoyez une pull request
+depuis une branche dédiée.
 
 ---
 

@@ -2,6 +2,7 @@ package com.imt.clients;
 
 import com.imt.clients.model.Client;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,4 +46,20 @@ public interface ClientStorageProvider {
      * @param id l'identifiant du client à supprimer
      */
     void delete(final UUID id);
+
+    /**
+     * Recherche un client par son numéro de licence.
+     *
+     * @param licenseNumber le numéro de licence du client
+     */
+    Optional<Client> findByLicenseNumber(final String licenseNumber);
+
+    /**
+     * Recherche un client par son nom, prénom et date de naissance.
+     *
+     * @param lastName
+     * @param firstName
+     * @param birthDate
+     */
+    Optional<Client> findByLastNameAndFirstNameAndBirthDate(final String lastName, final String firstName, final LocalDate birthDate);
 }
