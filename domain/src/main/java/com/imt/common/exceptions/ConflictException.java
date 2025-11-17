@@ -8,7 +8,7 @@ import java.io.Serial;
 
 /**
  * Exception levée lorsqu'il y a un conflit avec l'état actuel de la ressource.
- * Utilisée notamment lorsqu'un client ou un véhicule existe déjà.
+ * Utilisée notamment lorsqu'un client déjà.
  */
 @Getter
 @RequiredArgsConstructor

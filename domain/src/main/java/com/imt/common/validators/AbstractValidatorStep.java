@@ -1,5 +1,6 @@
 package com.imt.common.validators;
 
+import com.imt.clients.model.Client;
 import com.imt.common.exceptions.ImtException;
 import com.imt.common.model.ValidatorResult;
 
