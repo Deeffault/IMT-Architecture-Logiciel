@@ -10,26 +10,13 @@
         <module name="adapters-in-rest" />
         <module name="application" />
         <module name="adapters-in-scheduler" />
-      </profile>
-      <profile name="Annotation profile for IMT-Architecture-Logiciel" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-        </processorPath>
         <module name="domain" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="domain" target="21" />
-      <module name="IMT-Architecture-Logiciel" target="21" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="IMT-Architecture-Logiciel" options="-parameters" />
+      <module name="IMT-Architecture-Logiciel" options="" />
       <module name="adapters-in-rest" options="-parameters" />
       <module name="adapters-in-scheduler" options="-parameters" />
       <module name="adapters-out-bdd" options="-parameters" />
