@@ -10,12 +10,9 @@
     </parent>
 
     <artifactId>domain</artifactId>
-
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>domain</name>
+    <description>Module dédié au code métier</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

@@ -8,15 +8,13 @@ import com.imt.clients.ClientsService;
 import com.imt.clients.ClientsServiceValidator;
 import com.imt.clients.model.Client;
 import com.imt.common.exceptions.ImtException;
+import com.imt.common.exceptions.ResourceNotFoundException;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +30,7 @@ public class ClientsController {
 
     // L'erreur "Could not autowire" ici est un faux positif de l'IDE si BeanConfiguration n'est pas scanné.
     // Au runtime, Spring trouvera les Beans définis dans BeanConfiguration.
+    // C'est à mettre dans le module application si on veut éviter ce genre de problème au moment de build l'app.
     public ClientsController(
             ClientsServiceValidator clientsServiceValidator,
             ClientsService clientsService,
@@ -50,9 +49,10 @@ public class ClientsController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ClientOutput> updateClient(@PathVariable String id, // String ici
-                                                     @RequestBody ClientUpdateInput clientUpdateInput)
-            throws ImtException {
+    public ResponseEntity<ClientOutput> updateClient(
+            @PathVariable String id,
+            @RequestBody ClientUpdateInput clientUpdateInput
+    ) throws ImtException {
 
         Client existingClient = clientsService.getOne(id)
                 // Correction : Utilisation de ResourceNotFoundException au lieu de ImtException
@@ -68,6 +68,7 @@ public class ClientsController {
     public ResponseEntity<ClientOutput> getClientById(@PathVariable String id) throws ImtException {
         Client client = clientsService.getOne(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
+
         return ResponseEntity.ok(mapper.toDo(client));
     }
 
@@ -76,12 +77,14 @@ public class ClientsController {
         Collection<ClientOutput> dtos = clientsService.getAll().stream()
                 .map(mapper::toDo) // Cela devrait marcher si toDto est public dans le mapper
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable String id) throws ImtException {
         clientsService.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 }
