@@ -14,7 +14,7 @@ public interface ClientStorageProvider {
      * @param id l'identifiant du client
      * @return true si le client existe, false sinon
      */
-    boolean exist(final UUID id);
+    boolean exist(final String id);
 
     /**
      * Récupère tous les clients stockés.
@@ -29,7 +29,7 @@ public interface ClientStorageProvider {
      * @param id l'identifiant unique du client
      * @return un Optional contenant le client s'il existe, Optional.empty() sinon
      */
-    Optional<Client> get(final UUID id);
+    Optional<Client> get(final String id);
 
     /**
      * Sauvegarde un client (création ou mise à jour).
@@ -45,7 +45,7 @@ public interface ClientStorageProvider {
      *
      * @param id l'identifiant du client à supprimer
      */
-    void delete(final UUID id);
+    void delete(final String id);
 
     /**
      * Recherche un client par son numéro de licence.

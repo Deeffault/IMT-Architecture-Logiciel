@@ -8,93 +8,95 @@
 ## 📋 Description
 
 Projet Spring Boot de gestion de location automobile, réalisé dans le cadre du TP d'Architecture Logicielle à l'IMT.
-L'objectif est de mettre en œuvre une **Architecture Hexagonale (Ports & Adapters)** pour séparer clairement la logique
-métier des détails techniques et faciliter la testabilité.
+L'objectif est de mettre en œuvre une **Architecture Hexagonale (Ports & Adapters)** stricte via une approche *
+*Multi-Modules Maven** pour garantir l'isolation du domaine métier.
 
 ## ✨ Fonctionnalités principales
 
-- Gestion des clients : création et mise à jour (nom, prénom, date de naissance, n° de permis).
-- Gestion des véhicules : parc de véhicules (immatriculation, modèle, état — disponible, en location, en panne).
-- Gestion des contrats : création et suivi des contrats de location (liaison client ↔ véhicule).
-- Règles métier automatisées :
-    - Annulation automatique des contrats "en attente" si un véhicule est déclaré "en panne".
-    - Passage automatique des contrats en "retard" si le véhicule n'est pas restitué.
-    - Annulation des contrats futurs si un retard bloque une location suivante.
-- Validation des DTOs via `spring-boot-starter-validation`.
+- **Clients** : Création et gestion (Validation d'unicité, formats de permis/nom/prénom).
+- **Véhicules** : Gestion du parc (Plaque d'immatriculation, état, motorisation).
+- **Contrats** : Cycle de vie de la location (Création, validation, clôture).
+- **Règles métier** :
+    - Validation en chaîne (Chain of Responsibility) pour les invariants et les règles métier complexes.
+    - Gestion des états de véhicules et d'annulations automatiques.
 
 ---
 
 ## 🏗️ Architecture — Hexagonale (Ports & Adapters)
 
-Le projet est organisé en trois couches principales :
+Le projet est divisé en modules Maven distincts pour forcer le respect des dépendances :
 
-1. `domain` — le cœur métier (modèles, règles, ports). Aucune dépendance technique.
-2. `application` — implémentation des cas d'usage (use cases) qui orchestrent le domaine.
-3. `infrastructure` — adaptateurs techniques (API REST, persistance MongoDB, tâches planifiées, configuration Spring).
+1. `domain` : Le cœur pur. Contient les modèles, les règles et les interfaces (Ports). **Aucune dépendance Spring.**
+2. `adapters-in-rest` : L'API Web. Convertit les JSON en objets métier.
+3. `adapters-out-bdd` : La persistance. Implémente les interfaces de stockage du domaine.
+4. `adapters-in-scheduler` : Les tâches planifiées (Batchs).
+5. `application` : Le point d'entrée. Assemble et configure l'application.
 
 ### Structure conceptuelle
 
 ```plaintext
 imt-architecture-logiciel/
 │
-├── domain/                                  # 🎯 Module Domain (Cœur métier, pur Java, SANS Spring)
-│   └── src/main/java/
-│       └── com.imt/
-│           ├── clients/
-│           │   ├── model/
-│           │   │   └── Client.java                   (Le modèle métier pur, immuable)
-│           │   ├── validators/
-│           │   │   ├── ClientUnicityValidatorStep.java   (Règle: nom+prénom+date)
-│           │   │   └── ClientUnicityLicenseValidatorStep.java (Règle: numPermis unique)
-│           │   ├── ClientStorageProvider.java        (PORT DE SORTIE / Repository Interface)
-│           │   ├── ClientsService.java               (Service de base, CRUD)
-│           │   └── ClientsServiceValidator.java      (PORT D'ENTRÉE / Use Case + Validation)
-│           │
-│           ├── vehicules/
-│           │   ├── model/
-│           │   │   ├── Vehicule.java                  
-│           │   │   └── EtatVehicule.java              
-│           │   ├── port/out/
-│           │   │   └── VehiculeRepository.java        (PORT DE SORTIE)
-│           │   ├── service/
-│           │   │   └── VehiculeService.java           (PORT D'ENTRÉE)
-│           │   └── ...
-│           │
-│           ├── contrats/
-│           │   ├── model/
-│           │   │   ├── Contrat.java                   
-│           │   │   └── EtatContrat.java               
-│           │   ├── service/
-│           │   │   └── ContratService.java            (PORT D'ENTRÉE)
-│           │   └── ...
-│           │
-│           └── common/
-│               ├── exceptions/
-│               │   ├── ImtException.java            (Exception de base)
-│               │   ├── BadRequestException.java     (Pour validation @Pattern)
-│               │   └── ConflictException.java       (Pour unicité)
-│               ├── model/
-│               │   └── ValidatorResult.java         (Résultat de la chaîne)
-│               └── validators/
-│                   ├── AbstractValidatorStep.java   (Base de la chaîne)
-│                   └── ConstraintValidatorStep.java (Validation des @NotNull, @Pattern)
+├── domain/                                      # 🎯 COEUR MÉTIER (Java Pur)
+│   └── src/main/java/com/imt/
+│       ├── clients/
+│       │   ├── model/                           # Modèles immuables & riches
+│       │   │   └── Client.java
+│       │   ├── validators/                      # Règles métier (Chain of Responsibility)
+│       │   │   ├── ClientUnicityValidatorStep.java
+│       │   │   └── ClientUnicityLicenseValidatorStep.java
+│       │   ├── ClientStorageProvider.java       # [PORT OUT] Interface Repository
+│       │   ├── ClientsService.java              # Logique métier de base (CRUD)
+│       │   └── ClientsServiceValidator.java     # [PORT IN] Point d'entrée avec validation
+│       │
+│       ├── vehicle/
+│       │   ├── model/
+│       │   │   ├── Vehicle.java
+│       │   │   ├── EngineTypeEnum.java
+│       │   │   └── VehicleStateEnum.java
+│       │   ├── validators/
+│       │   │   ├── VehicleAlreadyExistValidatorStep.java
+│       │   │   ├── VehicleEngineTypeValidatorStep.java
+│       │   │   └── VehicleStateValidatorStep.java
+│       │   ├── VehicleStorageProvider.java      # [PORT OUT]
+│       │   ├── VehicleService.java
+│       │   └── VehicleServiceValidator.java     # [PORT IN]
+│       │
+│       └── common/                              # Briques partagées du domaine
+│           ├── exceptions/                      # Exceptions métier (ResourceNotFound, Conflict...)
+│           │   ├── BadRequestException.java
+│           │   ├── ConflictException.java
+│           │   ├── ImtException.java
+│           │   └── ResourceNotFoundException.java
+│           ├── model/                           # Objets transverses
+│           │   └── ValidatorResult.java
+│           └── validators/                      # Moteur de validation
+│               ├── AbstractValidatorStep.java
+│               └── ConstraintValidatorStep.java
 │
-├── adapters-in-rest/                        # 🔌 Module REST (Adaptateur primaire)
-│   └── src/main/java/
-│       └── com.imt.IMT_Architecture_Logiciel.rest/
-│           ├── clients/
-│           │   ├── ClientsController.java
-│           │   └── dto/
-│           │       ├── input/
-│           │       └── output/
-│           ├── vehicules/
-│           │   ├── VehiculesController.java
-│           │   └── dto/
-│           ├── contrats/
-│           │   ├── ContratsController.java
-│           │   └── dto/
-│           └── common/
-│               └── GlobalExceptionHandler.java
+├── adapters-in-rest/                            # 🔌 ADAPTATEUR PRIMAIRE (REST)
+│   └── src/main/java/com/imt/adaptersinrest/
+│       ├── clients/
+│       │   ├── mapper/                          # Conversion DTO <-> Domain
+│       │   │   └── ClientApiMapper.java
+│       │   ├── model/                           # DTOs (Data Transfer Objects)
+│       │   │   ├── input/                       # JSON reçus
+│       │   │   │   ├── ClientInput.java
+│       │   │   │   └── ClientUpdateInput.java
+│       │   │   └── output/                      # JSON renvoyés
+│       │   │       └── ClientOutput.java
+│       │   └── ClientsController.java           # Appelle le Domain (ClientsServiceValidator)
+│       │
+│       └── common/                              # Gestion globale des erreurs et formats
+│           └── model/
+│               ├── input/
+│               │   ├── AbstractInput.java
+│               │   ├── AbstractUpdateInput.java
+│               │   └── UpdatableProperty.java   # Wrapper pour le PATCH (Gestion des nulls)
+│               └── output/
+│                   ├── AbstractOutput.java
+│                   ├── ExceptionOutput.java
+│                   └── ControllerExceptionHandler.java
 │
 ├── adapters-in-scheduler/                   # 📡 Module Scheduler (Adaptateur primaire)
 │   └── src/main/java/
