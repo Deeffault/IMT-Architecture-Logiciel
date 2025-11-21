@@ -7,33 +7,30 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="adapters-out-bdd" />
-        <module name="adapters-in-rest" />
-        <module name="application" />
+        <module name="application (1)" />
         <module name="adapters-in-scheduler" />
-      </profile>
-      <profile name="Annotation profile for IMT-Architecture-Logiciel" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-        </processorPath>
         <module name="domain" />
+        <module name="adapters-in-rest" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="domain" target="21" />
-      <module name="IMT-Architecture-Logiciel" target="21" />
+      <module name="adapters-in-rest (1)" target="21" />
+      <module name="adapters-in-scheduler (1)" target="21" />
+      <module name="adapters-out-bdd (1)" target="21" />
+      <module name="application" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="IMT-Architecture-Logiciel" options="-parameters" />
+      <module name="IMT-Architecture-Logiciel" options="" />
       <module name="adapters-in-rest" options="-parameters" />
+      <module name="adapters-in-rest (1)" options="-parameters" />
       <module name="adapters-in-scheduler" options="-parameters" />
+      <module name="adapters-in-scheduler (1)" options="-parameters" />
       <module name="adapters-out-bdd" options="-parameters" />
+      <module name="adapters-out-bdd (1)" options="-parameters" />
       <module name="application" options="-parameters" />
+      <module name="application (1)" options="-parameters" />
       <module name="domain" options="-parameters" />
     </option>
   </component>
