@@ -45,7 +45,7 @@ public class ClientsController {
             throws ImtException {
         Client clientDomain = mapper.toDomain(clientInput);
         Client clientCree = clientsServiceValidator.create(clientDomain);
-        return new ResponseEntity<>(mapper.toDo(clientCree), HttpStatus.CREATED);
+        return new ResponseEntity<>(mapper.toDto(clientCree), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
@@ -61,7 +61,7 @@ public class ClientsController {
         Client clientToUpdate = mapper.toDomain(clientUpdateInput, existingClient);
         clientsServiceValidator.update(clientToUpdate);
 
-        return ResponseEntity.ok(mapper.toDo(clientToUpdate));
+        return ResponseEntity.ok(mapper.toDto(clientToUpdate));
     }
 
     @GetMapping("/{id}")
@@ -69,13 +69,13 @@ public class ClientsController {
         Client client = clientsService.getOne(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
 
-        return ResponseEntity.ok(mapper.toDo(client));
+        return ResponseEntity.ok(mapper.toDto(client));
     }
 
     @GetMapping
     public ResponseEntity<Collection<ClientOutput>> getAllClients() {
         Collection<ClientOutput> dtos = clientsService.getAll().stream()
-                .map(mapper::toDo) // Cela devrait marcher si toDto est public dans le mapper
+                .map(mapper::toDto) // Cela devrait marcher si toDto est public dans le mapper
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(dtos);

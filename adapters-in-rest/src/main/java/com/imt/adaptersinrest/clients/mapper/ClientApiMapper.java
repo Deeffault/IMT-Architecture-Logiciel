@@ -38,7 +38,7 @@ public class ClientApiMapper {
     /**
      * Convertit un objet du Domaine en DTO de sortie (Réponse JSON).
      */
-    public ClientOutput toDo(Client client) {
+    public ClientOutput toDto(Client client) {
         ClientOutput dto = new ClientOutput();
         dto.setId(client.getId());
         dto.setLastName(client.getLastName());
