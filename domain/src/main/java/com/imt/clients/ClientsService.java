@@ -18,7 +18,7 @@ public class ClientsService {
         return Objects.requireNonNullElse(this.service.getAll(), Collections.emptySet());
     }
 
-    public Optional<Client> getOne(final UUID id) {
+    public Optional<Client> getOne(final String id) {
         return this.service.get(id);
     }
 
@@ -30,7 +30,7 @@ public class ClientsService {
         this.service.save(client);
     }
 
-    public void delete(final UUID id) throws ImtException {
+    public void delete(final String id) throws ImtException {
         this.service.delete(id);
     }
 }
