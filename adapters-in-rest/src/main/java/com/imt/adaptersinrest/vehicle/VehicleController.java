@@ -7,7 +7,6 @@ import com.imt.adaptersinrest.vehicle.model.input.VehicleUpdateInput;
 import com.imt.adaptersinrest.vehicle.model.output.VehicleOutput;
 import com.imt.common.exceptions.ImtException;
 import com.imt.vehicle.VehicleServiceValidator;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

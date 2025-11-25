@@ -25,6 +25,7 @@ public class VehicleUpdateInput extends AbstractUpdateInput {
     private UpdatableProperty<String> model = UpdatableProperty.empty();
     private UpdatableProperty<EngineTypeEnum> engineType = UpdatableProperty.empty();
     private UpdatableProperty<String> color = UpdatableProperty.empty();
+    // License plate update is not allowed
     // private UpdatableProperty<String> licensePlate = UpdatableProperty.empty();
     private UpdatableProperty<LocalDate> acquisitionDate = UpdatableProperty.empty();
     private UpdatableProperty<VehicleStateEnum> state = UpdatableProperty.empty();
