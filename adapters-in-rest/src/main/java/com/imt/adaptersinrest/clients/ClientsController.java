@@ -1,16 +1,15 @@
 package com.imt.adaptersinrest.clients;
 
-import com.imt.adaptersinrest.clients.mapper.ClientApiMapper;
 import com.imt.adaptersinrest.clients.model.input.ClientInput;
 import com.imt.adaptersinrest.clients.model.input.ClientUpdateInput;
 import com.imt.adaptersinrest.clients.model.output.ClientOutput;
 import com.imt.clients.ClientsService;
 import com.imt.clients.ClientsServiceValidator;
-import com.imt.clients.model.Client;
 import com.imt.common.exceptions.ImtException;
 import com.imt.common.exceptions.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,65 +25,63 @@ public class ClientsController {
 
     private final ClientsServiceValidator clientsServiceValidator;
     private final ClientsService clientsService;
-    private final ClientApiMapper mapper;
 
-    // L'erreur "Could not autowire" ici est un faux positif de l'IDE si BeanConfiguration n'est pas scanné.
-    // Au runtime, Spring trouvera les Beans définis dans BeanConfiguration.
-    // C'est à mettre dans le module application si on veut éviter ce genre de problème au moment de build l'app.
     public ClientsController(
             ClientsServiceValidator clientsServiceValidator,
-            ClientsService clientsService,
-            ClientApiMapper mapper) {
+            ClientsService clientsService) {
         this.clientsServiceValidator = clientsServiceValidator;
         this.clientsService = clientsService;
-        this.mapper = mapper;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientOutput> createClient(@Valid @RequestBody ClientInput clientInput)
             throws ImtException {
-        Client clientDomain = mapper.toDomain(clientInput);
-        Client clientCree = clientsServiceValidator.create(clientDomain);
-        return new ResponseEntity<>(mapper.toDto(clientCree), HttpStatus.CREATED);
+        // Utilisation de ClientInput.convert
+        return new ResponseEntity<>(
+                ClientOutput.from(clientsServiceValidator.create(ClientInput.convert(clientInput))),
+                HttpStatus.CREATED
+        );
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientOutput> updateClient(
             @PathVariable String id,
             @RequestBody ClientUpdateInput clientUpdateInput
     ) throws ImtException {
 
-        Client existingClient = clientsService.getOne(id)
-                // Correction : Utilisation de ResourceNotFoundException au lieu de ImtException
-                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé avec l'id " + id));
-
-        Client clientToUpdate = mapper.toDomain(clientUpdateInput, existingClient);
-        clientsServiceValidator.update(clientToUpdate);
-
-        return ResponseEntity.ok(mapper.toDto(clientToUpdate));
+        // Logique condensée comme dans VehicleController
+        return ResponseEntity.ok(
+                ClientOutput.from(
+                        clientsServiceValidator.update(
+                                clientsService.getOne(id)
+                                        .map(existing -> ClientUpdateInput.from(clientUpdateInput, existing))
+                                        .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé avec l'id " + id))
+                        )
+                )
+        );
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientOutput> getClientById(@PathVariable String id) throws ImtException {
-        Client client = clientsService.getOne(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"));
-
-        return ResponseEntity.ok(mapper.toDto(client));
+        return ResponseEntity.ok(
+                clientsService.getOne(id)
+                        .map(ClientOutput::from) // Utilisation de ClientOutput::from
+                        .orElseThrow(() -> new ResourceNotFoundException("Client non trouvé"))
+        );
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<ClientOutput>> getAllClients() {
         Collection<ClientOutput> dtos = clientsService.getAll().stream()
-                .map(mapper::toDto) // Cela devrait marcher si toDto est public dans le mapper
+                .map(ClientOutput::from) // Utilisation de ClientOutput::from
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(dtos);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable String id) throws ImtException {
         clientsService.delete(id);
-
         return ResponseEntity.noContent().build();
     }
 }

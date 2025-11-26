@@ -26,8 +26,10 @@ public class ClientsService {
         return this.service.save(client);
     }
 
-    public void update(final Client client) throws ImtException {
+    public Client update(final Client client) throws ImtException {
         this.service.save(client);
+
+        return client;
     }
 
     public void delete(final String id) throws ImtException {

@@ -49,13 +49,15 @@ public class ClientsServiceValidator extends ClientsService {
      * Valide que les contraintes sur l'objet sont respectées.
      *
      * @param client
+     * @return
      * @throws ImtException
      */
-    public void update(final Client client) throws ImtException {
+    public Client update(final Client client) throws ImtException {
         new ConstraintValidatorStep<Client>()
                 .validate(client)
                 .throwIfInvalid();
 
         super.update(client);
+        return client;
     }
 }
