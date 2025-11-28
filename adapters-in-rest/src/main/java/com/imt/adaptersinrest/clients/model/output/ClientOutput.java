@@ -1,18 +1,37 @@
 package com.imt.adaptersinrest.clients.model.output;
 
 import com.imt.adaptersinrest.common.model.output.AbstractOutput;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.imt.clients.model.Client;
+import lombok.*;
 
+import java.io.Serial;
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Builder(toBuilder = true)
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@ToString
 public class ClientOutput extends AbstractOutput {
-    private String id;
-    private String lastName;
-    private String firstName;
-    private LocalDate dateOfBirth;
-    private String licenseNumber;
-    private String adress;
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private final String id;
+    private final String lastName;
+    private final String firstName;
+    private final LocalDate dateOfBirth;
+    private final String licenseNumber;
+    private final String adress;
+
+    // Domain --> DTO
+    public static ClientOutput from(final Client client) {
+        return ClientOutput.builder()
+                .id(client.getId())
+                .lastName(client.getLastName())
+                .firstName(client.getFirstName())
+                .dateOfBirth(client.getDateOfBirth())
+                .licenseNumber(client.getLicenseNumber())
+                .adress(client.getAdress())
+                .build();
+    }
 }
