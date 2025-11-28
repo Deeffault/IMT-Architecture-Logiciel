@@ -32,6 +32,37 @@ Le projet est divisé en modules Maven distincts pour forcer le respect des dép
 4. `adapters-in-scheduler` : Les tâches planifiées (Batchs).
 5. `application` : Le point d'entrée. Assemble et configure l'application.
 
+```plaintext
+            ┌─────────────────────────────────────────────────┐
+            │           ADAPTATEURS PRIMAIRES                 │
+            ├─────────────────────────────────────────────────┤
+            │  adapters-in-rest      │  adapters-in-scheduler │
+            │  (API REST)            │  (Tâches planifiées)   │
+            └──────────────┬─────────┴───────────┬────────────┘
+                           │                     │
+                           ▼                     ▼
+                     ┌─────────────────────────────────┐
+                     │          APPLICATION            │
+                     │    (Composition & Config)       │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │           DOMAIN                │
+                     │    (Logique métier pure)        │
+                     │    - Pas de dépendances         │
+                     │    - Java pur                   │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │   ADAPTATEURS SECONDAIRES       │
+                     ├─────────────────────────────────┤
+                     │      adapters-out-bdd           │
+                     │      (Persistance MongoDB)      │
+                     └─────────────────────────────────┘
+```
+
 ### Structure conceptuelle
 
 ```plaintext
@@ -157,6 +188,24 @@ imt-architecture-logiciel/
 
 ---
 
+## 📚 Principes architecturaux
+
+### Architecture Hexagonale
+
+- Indépendance du domaine : Aucune dépendance vers les frameworks
+- Ports & Adapters : Interfaces claires entre les couches
+- Inversion de dépendance : Le domaine définit ses contrats
+- Testabilité : Le cœur métier est facilement testable
+
+### Design Patterns utilisés
+
+- Chain of Responsibility : Validation en chaîne
+- Repository Pattern : Abstraction de la persistance
+- Service Layer : Orchestration métier
+- DTO Pattern : Séparation modèle métier/API
+
+---
+
 ## 🐳 Démarrage rapide
 
 Prérequis : Docker & Docker Compose (ou Java 21 + Maven si vous exécutez localement).
@@ -208,14 +257,6 @@ Adaptez les identifiants selon votre configuration locale.
 ## 🌊 Workflow Git (conseillé)
 
 Branche principale : `main`
-
-Branches de travail :
-
-- `feature/<descr>` — nouvelles fonctionnalités
-- `fix/<descr>` — corrections de bugs
-- `hotfix/<descr>` — corrections urgentes sur `main`
-- `chore/<descr>` — tâches non-fonctionnelles
-- `release/<version>` — préparation de release
 
 Format de commit (Conventional Commits) :
 
