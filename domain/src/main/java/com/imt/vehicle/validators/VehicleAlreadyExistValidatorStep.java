@@ -16,7 +16,7 @@ public class VehicleAlreadyExistValidatorStep extends AbstractValidatorStep<Vehi
     public void check(final Vehicle toValidate) throws ImtException {
         this.service.getByLicensePlate(toValidate.getLicensePlate())
                 .ifPresent(existingVehicle -> {
-                    if (!existingVehicle.getIdentifier().equals(toValidate.getIdentifier())) {
+                    if (!existingVehicle.getId().equals(toValidate.getId())) {
                         try {
                             throw new ConflictException(
                                     String.format("Un véhicule avec la plaque d'immatriculation '%s' existe déjà.", toValidate.getLicensePlate())

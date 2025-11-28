@@ -4,30 +4,33 @@ import com.imt.adaptersoutbdd.vehicle.repositories.VehicleRepository;
 import com.imt.adaptersoutbdd.vehicle.repositories.mappers.VehicleBddMapper;
 import com.imt.vehicle.VehicleStorageProvider;
 import com.imt.vehicle.model.Vehicle;
+import lombok.AllArgsConstructor; // <--- AJOUT
+import org.springframework.stereotype.Service; // <--- AJOUT
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service // <--- Indispensable pour être détecté par le scanBasePackages de Application.java
+@AllArgsConstructor // <--- Indispensable pour injecter le repository et le mapper
 public class VehicleBddService implements VehicleStorageProvider {
 
-    private VehicleRepository vehicleRepository;
-
-    private VehicleBddMapper vehicleBddMapper;
+    private final VehicleRepository vehicleRepository;
+    private final VehicleBddMapper vehicleBddMapper;
 
     @Override
     public boolean exist(UUID identifier) {
-        return false;
+        // Implémentation réelle à faire (sinon retourne toujours false)
+        return vehicleRepository.existsById(identifier.toString());
     }
 
     @Override
     public Collection<Vehicle> getAll() {
-        List<Vehicle> vehicles = vehicleRepository.findAll()
+        return vehicleRepository.findAll()
                 .stream()
                 .map(vehicleBddMapper::from)
                 .toList();
-        return vehicles;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class VehicleBddService implements VehicleStorageProvider {
 
     @Override
     public Vehicle save(final Vehicle vehicle) {
-        Optional.ofNullable(vehicle);  
+        // Pas besoin de Optional.ofNullable(vehicle) si on ne l'utilise pas
         return this.vehicleBddMapper.from(
                 this.vehicleRepository.save(
                         this.vehicleBddMapper.to(vehicle)

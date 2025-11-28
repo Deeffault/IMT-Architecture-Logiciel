@@ -7,13 +7,18 @@ import com.imt.common.exceptions.ImtException;
 import com.imt.common.validators.AbstractValidatorStep;
 import lombok.AllArgsConstructor;
 
+import java.util.Optional;
+
 @AllArgsConstructor
 public class ClientUnicityLicenseValidatorStep extends AbstractValidatorStep<Client> {
     protected ClientStorageProvider service;
 
     @Override
     public void check(Client toValidate) throws ImtException {
-        if (service.findByLicenseNumber(toValidate.getLicenseNumber()).isPresent()) {
+        Optional<Client> existing = service.findByLicenseNumber(toValidate.getLicenseNumber());
+
+        // Si un permis existe ET que ce n'est pas celui du client actuel, alors conflit
+        if (existing.isPresent() && !existing.get().getId().equals(toValidate.getId())) {
             throw new ConflictException(String.format(
                     "A client with license number '%s' already exists.",
                     toValidate.getLicenseNumber()
