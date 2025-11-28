@@ -1,7 +1,6 @@
 package com.imt.adaptersinrest.vehicle;
 
 
-
 import com.imt.adaptersinrest.vehicle.model.input.VehicleInput;
 import com.imt.adaptersinrest.vehicle.model.input.VehicleUpdateInput;
 import com.imt.adaptersinrest.vehicle.model.output.VehicleOutput;
