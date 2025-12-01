@@ -26,5 +26,5 @@ public interface ClientRepository extends MongoRepository<ClientEntity, String> 
      * @param dateOfBirth
      * @return
      */
-    Optional<ClientEntity> findByLastNameAndFirstNameAndBirthDate(String lastName, String firstName, LocalDate dateOfBirth);
+    Optional<ClientEntity> findByLastNameAndFirstNameAndDateOfBirth(String lastName, String firstName, LocalDate dateOfBirth);
 }

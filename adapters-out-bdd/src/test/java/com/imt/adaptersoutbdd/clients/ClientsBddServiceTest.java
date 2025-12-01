@@ -141,8 +141,9 @@ class ClientsBddServiceTest {
         String prenom = "Jean";
         LocalDate date = LocalDate.now();
 
-        when(repository.findByLastNameAndFirstNameAndBirthDate(nom, prenom, date))
+        when(repository.findByLastNameAndFirstNameAndDateOfBirth(nom, prenom, date))
                 .thenReturn(Optional.of(testClientEntity));
+
         when(mapper.from(testClientEntity)).thenReturn(testClient);
 
         // When
@@ -150,6 +151,7 @@ class ClientsBddServiceTest {
 
         // Then
         assertTrue(result.isPresent());
-        verify(repository).findByLastNameAndFirstNameAndBirthDate(nom, prenom, date);
+
+        verify(repository).findByLastNameAndFirstNameAndDateOfBirth(nom, prenom, date);
     }
 }

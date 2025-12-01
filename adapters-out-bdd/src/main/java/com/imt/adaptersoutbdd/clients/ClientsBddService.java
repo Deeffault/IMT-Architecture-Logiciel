@@ -66,7 +66,7 @@ public class ClientsBddService implements ClientStorageProvider {
 
     @Override
     public Optional<Client> findByLastNameAndFirstNameAndBirthDate(String lastName, String firstName, LocalDate birthDate) {
-        return repository.findByLastNameAndFirstNameAndBirthDate(lastName, firstName, birthDate)
+        return repository.findByLastNameAndFirstNameAndDateOfBirth(lastName, firstName, birthDate)
                 .map(mapper::from);
     }
 }

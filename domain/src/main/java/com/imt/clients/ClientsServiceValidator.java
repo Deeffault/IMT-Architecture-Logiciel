@@ -54,6 +54,9 @@ public class ClientsServiceValidator extends ClientsService {
      */
     public Client update(final Client client) throws ImtException {
         new ConstraintValidatorStep<Client>()
+                // On réactive les règles d'unicité ici
+                .linkWith(new ClientUnicityValidatorStep(this.service))
+                .linkWith(new ClientUnicityLicenseValidatorStep(this.service))
                 .validate(client)
                 .throwIfInvalid();
 

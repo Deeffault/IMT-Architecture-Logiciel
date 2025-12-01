@@ -2,8 +2,10 @@ package com.imt.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.imt") // <--- CRUCIAL : Scanne tous les modules (rest, bdd, scheduler)
+@EnableMongoRepositories(basePackages = "com.imt")
 public class Application {
 
     public static void main(String[] args) {

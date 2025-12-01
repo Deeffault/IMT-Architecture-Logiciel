@@ -37,7 +37,7 @@ public class ClientInput extends AbstractInput {
     private LocalDate dateOfBirth;
 
     @NotNull(message = "License number cannot be null")
-    @Pattern(regexp = "^[A-Za-z]{2}\\d{3}[A-Za-z]{2}$", message = "License number pattern is invalid")
+    @Pattern(regexp = "^[A-Z0-9]{1,15}$", message = "License number pattern is invalid")
     private String licenseNumber;
 
     @NotNull(message = "Adress cannot be null")

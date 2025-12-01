@@ -3,7 +3,9 @@ package com.imt.adaptersoutbdd.vehicle.repositories.mappers;
 import com.imt.adaptersoutbdd.common.model.mappers.AbstractBddMapper;
 import com.imt.adaptersoutbdd.vehicle.repositories.entities.VehicleEntity;
 import com.imt.vehicle.model.Vehicle;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VehicleBddMapper extends AbstractBddMapper<Vehicle, VehicleEntity> {
     @Override
     public Vehicle from(VehicleEntity input) {

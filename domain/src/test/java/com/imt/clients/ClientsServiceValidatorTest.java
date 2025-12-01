@@ -43,7 +43,7 @@ class ClientsServiceValidatorTest {
                 .lastName("Valid")
                 .firstName("User")
                 .dateOfBirth(LocalDate.of(2000, 1, 1))
-                .licenseNumber("AB123YZ")
+                .licenseNumber("010203040506123")
                 .adress("123 Rue Test")
                 .build();
 
@@ -69,7 +69,7 @@ class ClientsServiceValidatorTest {
     @DisplayName("CREATE - Doit échouer si le permis existe déjà")
     void shouldNotCreateClientWhenLicenseExists() {
         // Given
-        String existingLicense = "AB123YZ"; // Une valeur VALIDE pour le pattern, mais DÉJÀ PRISE
+        String existingLicense = "010203040506123"; // Une valeur VALIDE pour le pattern, mais DÉJÀ PRISE
 
         Client invalidClient = Client.builder()
                 .lastName("Valid")
@@ -79,12 +79,12 @@ class ClientsServiceValidatorTest {
                 .adress("123 Rue Test")
                 .build();
 
-        // Mock : On dit "Si on cherche 'AB123YZ', on trouve quelqu'un"
+        // Mock : On dit "Si on cherche '010203040506123', on trouve quelqu'un"
         when(repository.findByLicenseNumber(existingLicense))
                 .thenReturn(Optional.of(Client.builder().build()));
 
         // When & Then
-        // 1. La ConstraintValidatorStep va passer (car "AB123YZ" respecte le pattern)
+        // 1. La ConstraintValidatorStep va passer (car "010203040506123" respecte le pattern)
         // 2. La ClientUnicityLicenseValidatorStep va échouer (car le mock dit qu'il existe)
         assertThatThrownBy(() -> service.create(invalidClient))
                 .isInstanceOf(ConflictException.class);
@@ -93,25 +93,61 @@ class ClientsServiceValidatorTest {
     }
 
     @Test
-    @DisplayName("UPDATE - Doit mettre à jour le client")
+    @DisplayName("UPDATE - Doit mettre à jour le client (unicité OK)")
     void shouldUpdateClient() throws ImtException {
         // Given
+        String clientId = UUID.randomUUID().toString();
         Client updateClient = Client.builder()
-                .id(UUID.randomUUID().toString())
+                .id(clientId)
                 .lastName("Updated")
                 .firstName("Name")
                 .dateOfBirth(LocalDate.of(1990, 1, 1))
-                .licenseNumber("AB123XX")
+                .licenseNumber("010203040506") // Format valide 12 chiffres
                 .adress("New Adress")
                 .build();
 
-        // Pour l'update, votre code actuel ne re-vérifie pas l'unicité,
-        // il vérifie juste les contraintes techniques (@NotNull...)
+        // Mock: Unicité OK (soit empty, soit le même client trouvé)
+        // Cas 1 : Le repository ne trouve personne avec ce permis (parfait)
+        when(repository.findByLicenseNumber(updateClient.getLicenseNumber()))
+                .thenReturn(Optional.empty());
+        // Cas 2 : Le repository ne trouve personne avec ce nom (parfait)
+        when(repository.findByLastNameAndFirstNameAndBirthDate(any(), any(), any()))
+                .thenReturn(Optional.empty());
 
         // When
         service.update(updateClient);
 
         // Then
         verify(repository).save(updateClient);
+    }
+
+    @Test
+    @DisplayName("UPDATE - Doit échouer si le nouveau permis appartient à un AUTRE client")
+    void shouldFailUpdateIfLicenseTakenByOther() {
+        // Given
+        String myId = "my-id";
+        String otherId = "other-id";
+        String conflictLicense = "999999999999";
+
+        Client clientToUpdate = Client.builder()
+                .id(myId)
+                .lastName("Me")
+                .firstName("Me")
+                .dateOfBirth(LocalDate.EPOCH)
+                .licenseNumber(conflictLicense)
+                .adress("Address")
+                .build();
+
+        // Mock : On trouve un client en base avec ce permis, mais c'est un AUTRE (otherId)
+        Client otherClient = Client.builder().id(otherId).build();
+
+        when(repository.findByLicenseNumber(conflictLicense))
+                .thenReturn(Optional.of(otherClient));
+
+        // When & Then
+        assertThatThrownBy(() -> service.update(clientToUpdate))
+                .isInstanceOf(ConflictException.class);
+
+        verify(repository, never()).save(any());
     }
 }

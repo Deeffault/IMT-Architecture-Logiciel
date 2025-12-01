@@ -32,7 +32,7 @@ public class VehicleOutput extends AbstractOutput {
     // Entity --> DTO
     public static VehicleOutput from(final Vehicle vehicle) {
         return VehicleOutput.builder()
-                .identifier(vehicle.getIdentifier())
+                .identifier(vehicle.getId())
                 .brand(vehicle.getBrand())
                 .model(vehicle.getModel())
                 .engineType(vehicle.getEngineType())

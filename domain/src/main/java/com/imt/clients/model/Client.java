@@ -20,9 +20,9 @@ public class Client {
     private static final String FIRST_NAME_LAST_NAME_PATTERN = "^[a-zA-Z- ]{2,100}$";
 
     /**
-     * Pattern pour le numéro de permis : 2 lettres suivie de 3 chiffres et 2 lettres.
+     * Pattern pour le numéro de permis : 15 charactères alphanumériques.
      */
-    private static final String LICENSE_NUMBER_PATTERN = "^[A-Za-z]{2}\\d{3}[A-Za-z]{2}$";
+    private static final String LICENSE_NUMBER_PATTERN = "^[A-Z0-9]{1,15}$";
 
     @Builder.Default
     @NotNull(message = "Id cannot be null")
@@ -41,7 +41,7 @@ public class Client {
     private LocalDate dateOfBirth;
 
     @NotNull(message = "License number cannot be null")
-    @Pattern(regexp = LICENSE_NUMBER_PATTERN, message = "License number must follow the pattern: 2 letters, 3 digits, 2 letters")
+    @Pattern(regexp = LICENSE_NUMBER_PATTERN, message = "License number must be between 1 and 15 alphanumeric characters")
     private String licenseNumber;
 
     @NotNull(message = "Adress cannot be null")
