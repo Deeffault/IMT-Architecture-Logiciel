@@ -37,8 +37,8 @@ public class BeanConfiguration {
     /**
      * Expose le service de gestion des contrats (avec validation).
      */
-//    @Bean
-//    public ContractsServiceValidator contractsServiceValidator(final ContractStorageProvider contractStorageProvider) {
-//        return new ContractsServiceValidator(contractStorageProvider);
-//    }
+    @Bean
+    public ContractsServiceValidator contractsServiceValidator(final ContractStorageProvider contractStorageProvider) {
+        return new ContractsServiceValidator(contractStorageProvider);
+    }
 }
