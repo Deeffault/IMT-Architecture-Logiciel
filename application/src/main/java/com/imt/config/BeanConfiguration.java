@@ -40,5 +40,5 @@ public class BeanConfiguration {
     @Bean
     public ContractsServiceValidator contractsServiceValidator(final ContractStorageProvider contractStorageProvider) {
         return new ContractsServiceValidator(contractStorageProvider);
-   }
+    }
 }

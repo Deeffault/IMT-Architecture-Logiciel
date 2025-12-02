@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * et sur le style utilisé pour les clients et les véhicules.
  */
 @RestController
-@RequestMapping("api/imt/v1/contracts")
+@RequestMapping("api/v1/contracts")
 public class ContractsController {
 
     private final ContractsServiceValidator service;
