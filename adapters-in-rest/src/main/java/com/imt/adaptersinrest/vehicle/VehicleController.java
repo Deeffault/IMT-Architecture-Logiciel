@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * Entry point: /api/imt/v1/vehicles
  */
 @RestController
-@RequestMapping("api/imt/v1/vehicles")
+@RequestMapping("api/v1/vehicles")
 public class VehicleController {
 
     private final VehicleServiceValidator service;
@@ -45,31 +45,34 @@ public class VehicleController {
         return VehicleOutput.from(service.create(VehicleInput.convert(input)));
     }
 
-    // Get a vehicle by ID
-    @GetMapping(value = "/{vehicleId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    // Get a vehicle by licence plate
+    @GetMapping(value = "/{licencePlate}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public VehicleOutput getOne(@PathVariable String vehicleId) {
-        return service.getOne(UUID.fromString(vehicleId))
+        return service.getByLicensePlate(vehicleId)
                 .map(VehicleOutput::from)
                 .orElseThrow(() -> new NoSuchElementException("Vehicle does not exist."));
     }
 
     // Update a vehicle
-    @PatchMapping(value = "/{vehicleId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{licencePlate}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable String vehicleId, @RequestBody VehicleUpdateInput input) throws ImtException {
         service.update(
-                service.getOne(UUID.fromString(vehicleId)).map(
+                service.getByLicensePlate(vehicleId).map(
                         alreadySaved -> VehicleUpdateInput.from(input, alreadySaved)
                 ).orElseThrow(() -> new NoSuchElementException("Vehicle does not exist."))
         );
     }
 
     // Delete a vehicle
-    @DeleteMapping(value = "/{vehicleId}")
+    @DeleteMapping(value = "/{licencePlate}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String vehicleId) throws ImtException {
-        service.delete(UUID.fromString(vehicleId));
+        service.delete(service.getByLicensePlate(vehicleId)
+                .map(vehicle -> vehicle.getId())
+                .orElseThrow(() -> new NoSuchElementException("Vehicle does not exist."))
+        );
     }
 }
 
