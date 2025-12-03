@@ -14,7 +14,8 @@ public class ContractJob {
 
     private final ContractsService contractsService;
 
-    @Scheduled(cron = "0 0 1 * * *") // Runs daily at 1 AM
+    //@Scheduled(cron = "0 0 1 * * *") // Runs daily at 1 AM
+    @Scheduled(cron = "*/10 * * * * *") // Toutes les 10 secondes pour les tests
     public void processOverdueContracts() {
         log.info("SCHEDULER - Démarrage du traitement des contrats en retard");
 

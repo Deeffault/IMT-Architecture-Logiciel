@@ -30,10 +30,10 @@
             <artifactId>adapters-out-bdd</artifactId>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>com.imt</groupId>-->
-        <!--            <artifactId>adapters-in-scheduler</artifactId>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>com.imt</groupId>
+            <artifactId>adapters-in-scheduler</artifactId>
+        </dependency>
 
     </dependencies>
 
