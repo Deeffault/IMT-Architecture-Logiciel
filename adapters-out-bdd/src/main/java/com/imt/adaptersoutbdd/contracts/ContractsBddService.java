@@ -111,7 +111,7 @@ public class ContractsBddService implements ContractStorageProvider {
     @Override
     public Collection<Contract> findPendingContractsByVehicleId(UUID vehicleId) {
         // On cherche ceux qui sont "EN ATTENTE" pour ce véhicule
-        return contractRepository.findByVehicleIdentifierAndState(vehicleId, ContractStateEnum.PENDING)
+        return contractRepository.findByVehicleIdAndState(vehicleId.toString(), ContractStateEnum.PENDING)
                 .stream()
                 .map(contractBddMapper::from)
                 .toList();

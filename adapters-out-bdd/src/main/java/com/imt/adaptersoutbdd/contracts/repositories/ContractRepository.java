@@ -24,7 +24,6 @@ public interface ContractRepository extends MongoRepository<ContractEntity, Stri
     List<ContractEntity> findByStateAndEndDateBefore(ContractStateEnum state, LocalDate date);
 
     // Pour la Règle 1 : Trouver les contrats EN ATTENTE liés à un véhicule
-    List<ContractEntity> findByVehicleIdentifierAndState(UUID vehicleIdentifier, ContractStateEnum state);
-}
+    List<ContractEntity> findByVehicleIdAndState(String vehicleId, ContractStateEnum state);}
 
 
