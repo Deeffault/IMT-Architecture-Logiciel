@@ -21,7 +21,7 @@ public class UpdatableProperty<T extends Serializable> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Getter(AccessLevel.PROTECTED)
+//    @Getter(AccessLevel.PROTECTED)
     @EqualsAndHashCode.Exclude
     private final boolean updated;
     private final T value;

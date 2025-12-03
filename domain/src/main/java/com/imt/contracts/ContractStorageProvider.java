@@ -23,6 +23,16 @@ public interface ContractStorageProvider {
     Contract save(final Contract contract);
 
     void delete(final UUID identifier);
+
+    /**
+     * Règle 2 : Trouve les contrats "En cours" dont la date de fin est passée (avant la date donnée).
+     */
+    Collection<Contract> findOverdueContracts(final LocalDate referenceDate);
+
+    /**
+     * Règle 1 & 3 : Trouve les contrats "En attente" liés à un véhicule spécifique.
+     */
+    Collection<Contract> findPendingContractsByVehicleId(final UUID vehicleId);
 }
 
 
