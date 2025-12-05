@@ -18,7 +18,7 @@ public class Vehicle {
 
     @Builder.Default
     @NotNull(message = "L'identifiant ne peut pas être nul")
-    private final UUID id = UUID.randomUUID();
+    private final String id = UUID.randomUUID().toString();
 
     @NotNull(message = "La marque ne peut pas être nulle")
     @Pattern(regexp = BRAND_MODEL_PATTERN, message = "La marque n'est pas valide : elle doit être composée de lettres, chiffres, espaces et tirets et faire entre 1 et 100 caractères")

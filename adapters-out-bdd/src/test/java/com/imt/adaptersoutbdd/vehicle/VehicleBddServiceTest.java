@@ -34,13 +34,12 @@ class VehicleBddServiceTest {
     private VehicleBddService service;
 
     private final String testId = "veh-123";
-    private final UUID testUUID = UUID.fromString(testId);
     private Vehicle testVehicle;
     private VehicleEntity testVehicleEntity;
 
     @BeforeEach
     void setUp() {
-        testVehicle = Vehicle.builder().id(testUUID).brand("Toyota").model("Corolla").build();
+        testVehicle = Vehicle.builder().id(testId).brand("Toyota").model("Corolla").build();
         testVehicleEntity = VehicleEntity.builder().id(testId).brand("Toyota").model("Corolla").build();
     }
 
@@ -49,7 +48,7 @@ class VehicleBddServiceTest {
     void exist_shouldReturnTrue_whenVehicleExists() {
         when(repository.existsById(testId)).thenReturn(true);
 
-        boolean result = service.exist(testUUID);
+        boolean result = service.exist(testId);
 
         assertTrue(result);
         verify(repository).existsById(testId);
@@ -75,7 +74,7 @@ class VehicleBddServiceTest {
         when(repository.findById(testId)).thenReturn(Optional.of(testVehicleEntity));
         when(mapper.from(testVehicleEntity)).thenReturn(testVehicle);
 
-        Optional<Vehicle> result = service.get(testUUID);
+        Optional<Vehicle> result = service.get(testId);
 
         assertTrue(result.isPresent());
         assertEquals(testVehicle, result.get());
@@ -100,7 +99,7 @@ class VehicleBddServiceTest {
     @Test
     @DisplayName("delete() - doit appeler le delete du repository")
     void delete_shouldCallRepository() {
-        service.delete(testUUID);
+        service.delete(testId);
         verify(repository).deleteById(testId);
     }
 

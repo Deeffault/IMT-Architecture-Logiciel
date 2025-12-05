@@ -12,6 +12,7 @@ import java.util.*;
  */
 @AllArgsConstructor
 public class ClientsService {
+
     protected ClientStorageProvider service;
 
     public Collection<Client> getAll() {
@@ -28,7 +29,6 @@ public class ClientsService {
 
     public Client update(final Client client) throws ImtException {
         this.service.save(client);
-
         return client;
     }
 

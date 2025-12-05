@@ -14,7 +14,7 @@ public class VehicleBddMapper extends AbstractBddMapper<Vehicle, VehicleEntity> 
         if (input == null) return null;
 
         return Vehicle.builder()
-                .id(UUID.fromString(input.getId()))
+                .id(input.getId())
                 .licensePlate(input.getLicensePlate())
                 .brand(input.getBrand())
                 .model(input.getModel())

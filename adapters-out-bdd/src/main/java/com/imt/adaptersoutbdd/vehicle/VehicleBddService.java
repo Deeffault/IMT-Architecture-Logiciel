@@ -20,8 +20,7 @@ public class VehicleBddService implements VehicleStorageProvider {
     private final VehicleBddMapper vehicleBddMapper;
 
     @Override
-    public boolean exist(UUID identifier) {
-        // Implémentation réelle à faire (sinon retourne toujours false)
+    public boolean exist(String identifier) {
         return vehicleRepository.existsById(identifier.toString());
     }
 
@@ -34,16 +33,13 @@ public class VehicleBddService implements VehicleStorageProvider {
     }
 
     @Override
-    public Optional<Vehicle> get(UUID identifier) {
-        return Optional.ofNullable(identifier)
-                .map(UUID::toString)
-                .flatMap(this.vehicleRepository::findById)
-                .map(this.vehicleBddMapper::from);
+    public Optional<Vehicle> get(String id) {
+        return vehicleRepository.findById(id)
+                .map(vehicleBddMapper::from);
     }
 
     @Override
     public Vehicle save(final Vehicle vehicle) {
-        // Pas besoin de Optional.ofNullable(vehicle) si on ne l'utilise pas
         return this.vehicleBddMapper.from(
                 this.vehicleRepository.save(
                         this.vehicleBddMapper.to(vehicle)
@@ -52,10 +48,8 @@ public class VehicleBddService implements VehicleStorageProvider {
     }
 
     @Override
-    public void delete(UUID identifier) {
-        Optional.ofNullable(identifier)
-                .map(UUID::toString)
-                .ifPresent(this.vehicleRepository::deleteById);
+    public void delete(String identifier) {
+        vehicleRepository.deleteById(identifier);
     }
 
     @Override

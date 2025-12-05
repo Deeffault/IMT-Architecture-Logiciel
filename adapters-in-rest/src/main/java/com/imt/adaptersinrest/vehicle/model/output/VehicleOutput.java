@@ -17,10 +17,11 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class VehicleOutput extends AbstractOutput {
-    @Serial
-    private static final long serialVersionUID = 987654321L;
 
-    private final UUID identifier;
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private final String identifier;
     private final String brand;
     private final String model;
     private final EngineTypeEnum engineType;

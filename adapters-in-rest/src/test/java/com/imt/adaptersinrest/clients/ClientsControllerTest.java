@@ -3,7 +3,6 @@ package com.imt.adaptersinrest.clients;
 import com.imt.adaptersinrest.clients.model.input.ClientInput;
 import com.imt.adaptersinrest.clients.model.input.ClientUpdateInput;
 import com.imt.adaptersinrest.clients.model.output.ClientOutput;
-import com.imt.adaptersinrest.common.model.input.UpdatableProperty; // Import correct
 import com.imt.clients.ClientsService;
 import com.imt.clients.ClientsServiceValidator;
 import com.imt.clients.model.Client;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -39,16 +37,16 @@ class ClientsControllerTest {
     @Mock
     private ClientsService clientsService;
 
-    private ClientsController controller;
+    private ClientsController clientsController;
 
     private ClientInput clientInput;
     private Client clientDomain;
-    private String clientId = "client-123";
+    private final String clientId = "client-123";
 
     @BeforeEach
     void setUp() {
         // Instanciation manuelle du contrôleur
-        controller = new ClientsController(clientsServiceValidator, clientsService);
+        clientsController = new ClientsController(clientsServiceValidator, clientsService);
 
         // Données de test
         clientInput = new ClientInput();
@@ -80,7 +78,7 @@ class ClientsControllerTest {
             when(clientsServiceValidator.create(any(Client.class))).thenReturn(clientDomain);
 
             // When
-            ResponseEntity<ClientOutput> response = controller.createClient(clientInput);
+            ResponseEntity<ClientOutput> response = clientsController.create(clientInput);
 
             // Then
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -103,7 +101,7 @@ class ClientsControllerTest {
                     .when(clientsServiceValidator).create(any(Client.class));
 
             // When & Then
-            assertThatThrownBy(() -> controller.createClient(clientInput))
+            assertThatThrownBy(() -> clientsController.create(clientInput))
                     .isInstanceOf(ConflictException.class)
                     .hasMessage("Client existe déjà");
         }
@@ -133,7 +131,7 @@ class ClientsControllerTest {
             when(clientsServiceValidator.update(any(Client.class))).thenReturn(clientDomain);
 
             // When
-            ResponseEntity<ClientOutput> response = controller.updateClient(clientId, updateInput);
+            ResponseEntity<ClientOutput> response = clientsController.update(clientId, updateInput);
 
             // Then
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -149,7 +147,7 @@ class ClientsControllerTest {
             when(clientsService.getOne(clientId)).thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() -> controller.updateClient(clientId, updateInput))
+            assertThatThrownBy(() -> clientsController.update(clientId, updateInput))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining("Client non trouvé");
 
@@ -168,7 +166,7 @@ class ClientsControllerTest {
             when(clientsService.getOne(clientId)).thenReturn(Optional.of(clientDomain));
 
             // When
-            ResponseEntity<ClientOutput> response = controller.getClientById(clientId);
+            ResponseEntity<ClientOutput> response = clientsController.getById(clientId);
 
             // Then
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -182,7 +180,7 @@ class ClientsControllerTest {
             when(clientsService.getOne(clientId)).thenReturn(Optional.empty());
 
             // When & Then
-            assertThatThrownBy(() -> controller.getClientById(clientId))
+            assertThatThrownBy(() -> clientsController.getById(clientId))
                     .isInstanceOf(ResourceNotFoundException.class);
         }
     }
@@ -199,7 +197,7 @@ class ClientsControllerTest {
             when(clientsService.getAll()).thenReturn(clients);
 
             // When
-            ResponseEntity<Collection<ClientOutput>> response = controller.getAllClients();
+            ResponseEntity<Collection<ClientOutput>> response = clientsController.getAll();
 
             // Then
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -216,7 +214,7 @@ class ClientsControllerTest {
         @DisplayName("Doit supprimer un client avec succès (204 No Content)")
         void shouldDeleteClientSuccessfully() throws ImtException {
             // When
-            ResponseEntity<Void> response = controller.deleteClient(clientId);
+            ResponseEntity<Void> response = clientsController.delete(clientId);
 
             // Then
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);

@@ -7,10 +7,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface VehicleStorageProvider {
-    boolean exist(final UUID identifier);
+    boolean exist(final String id);
     Collection<Vehicle> getAll();
-    Optional<Vehicle> get(final UUID identifier);
+    Optional<Vehicle> get(final String id);
     Optional<Vehicle> getByLicensePlate(final String licensePlate);
     Vehicle save(final Vehicle vehicle);
-    void delete(final UUID identifier);
+    void delete(final String id);
 }

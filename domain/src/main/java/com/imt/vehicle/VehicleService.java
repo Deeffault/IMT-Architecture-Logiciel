@@ -14,8 +14,8 @@ public class VehicleService {
         return Objects.requireNonNullElse(this.service.getAll(), Collections.emptySet());
     }
 
-    public Optional<Vehicle> getOne(final UUID identifier) {
-        return this.service.get(identifier);
+    public Optional<Vehicle> getOne(final String id) {
+        return this.service.get(id);
     }
 
     public Optional<Vehicle> getByLicensePlate(final String licensePlate) {
@@ -30,7 +30,7 @@ public class VehicleService {
         this.service.save(updatedVehicle);
     }
 
-    public void delete(final UUID identifier) throws ImtException {
+    public void delete(final String identifier) throws ImtException {
         this.service.delete(identifier);
     }
 }
