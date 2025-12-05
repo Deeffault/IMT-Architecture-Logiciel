@@ -25,7 +25,7 @@ public class ClientUpdateInput extends AbstractUpdateInput {
     private UpdatableProperty<String> lastName = UpdatableProperty.empty();
     private UpdatableProperty<String> firstName = UpdatableProperty.empty();
     private UpdatableProperty<LocalDate> dateOfBirth = UpdatableProperty.empty();
-    private UpdatableProperty<String> adress = UpdatableProperty.empty();
+    private UpdatableProperty<String> address = UpdatableProperty.empty();
 
     // PATCH conversion
     public static Client from(final ClientUpdateInput input, final Client existingClient) {
@@ -33,7 +33,7 @@ public class ClientUpdateInput extends AbstractUpdateInput {
                 .lastName(input.getLastName().defaultIfNotOverwrite(existingClient.getLastName()))
                 .firstName(input.getFirstName().defaultIfNotOverwrite(existingClient.getFirstName()))
                 .dateOfBirth(input.getDateOfBirth().defaultIfNotOverwrite(existingClient.getDateOfBirth()))
-                .adress(input.getAdress().defaultIfNotOverwrite(existingClient.getAdress()))
+                .address(input.getAddress().defaultIfNotOverwrite(existingClient.getAddress()))
                 .build();
     }
 }

@@ -10,6 +10,7 @@ import com.imt.vehicle.VehicleServiceValidator;
 import com.imt.vehicle.model.VehicleStateEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
  * Entry point: /api/imt/v1/vehicles
  */
 @RestController
-@RequestMapping("api/imt/v1/vehicles")
+@RequestMapping("api/v1/vehicles")
 public class VehicleController {
 
     private final VehicleServiceValidator vehicleService;
@@ -35,11 +36,12 @@ public class VehicleController {
     // Get all vehicles
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Collection<VehicleOutput> getAll() {
-        return vehicleService.getAll()
+    public ResponseEntity<Collection<VehicleOutput>> getAll() {
+        Collection<VehicleOutput> dtos = vehicleService.getAll()
                 .stream()
-                .map(VehicleOutput::from)
+                .map(VehicleOutput::from) // Utilisation de VehicleOutput::from
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     // Create a new vehicle
@@ -53,9 +55,9 @@ public class VehicleController {
     @GetMapping(value = "/{vehicleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public VehicleOutput getOne(@PathVariable String vehicleId) {
-        return vehicleService.getOne(UUID.fromString(vehicleId))
+        return vehicleService.getOne(vehicleId)
                 .map(VehicleOutput::from)
-                .orElseThrow(() -> new NoSuchElementException("Vehicle does not exist."));
+                .orElseThrow(() -> new NoSuchElementException("Vehicule non trouvé"));
     }
 
 //    // Update a vehicle
@@ -73,26 +75,26 @@ public class VehicleController {
     @DeleteMapping(value = "/{vehicleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String vehicleId) throws ImtException {
-        vehicleService.delete(UUID.fromString(vehicleId));
+        vehicleService.delete(vehicleId);
     }
 
     // Update a vehicle with business rule enforcement
     @PatchMapping(value = "/{vehicleId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable String vehicleId, @RequestBody VehicleUpdateInput input) throws ImtException {
-        UUID vId = UUID.fromString(vehicleId);
+
 
         // 1. Mise à jour du véhicule
         vehicleService.update(
-                vehicleService.getOne(vId).map(
+                vehicleService.getOne(vehicleId).map(
                         alreadySaved -> VehicleUpdateInput.from(input, alreadySaved)
-                ).orElseThrow(() -> new NoSuchElementException("Vehicle does not exist."))
+                ).orElseThrow(() -> new NoSuchElementException("Vehicule non trouvé."))
         );
 
         // 2. Règle Métier : Si l'état a été modifié ET qu'il est "En panne" (BROKEN)
         // Grâce à la modification de l'étape 1, isUpdated() est maintenant accessible
         if (input.getState().isUpdated() && input.getState().getValue() == VehicleStateEnum.BROKEN) {
-            contractsService.cancelContractsForBrokenVehicule(vId);
+            contractsService.cancelContractsForBrokenVehicule(UUID.fromString(vehicleId));
         }
     }
 }

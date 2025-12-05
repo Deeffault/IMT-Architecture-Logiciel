@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 @RequestMapping("api/v1/contracts")
 public class ContractsController {
 
-    private final ContractsServiceValidator service;
+    private final ContractsServiceValidator contractsService;
 
-    public ContractsController(final ContractsServiceValidator service) {
-        this.service = service;
+    public ContractsController(final ContractsServiceValidator contractsService) {
+        this.contractsService = contractsService;
     }
 
     /**
@@ -37,7 +37,7 @@ public class ContractsController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Collection<ContractOutput> getAll() {
-        return service.getAll()
+        return contractsService.getAll()
                 .stream()
                 .map(ContractOutput::from)
                 .collect(Collectors.toList());
@@ -49,9 +49,9 @@ public class ContractsController {
     @GetMapping(value = "/{contractId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ContractOutput getOne(@PathVariable final String contractId) {
-        return service.getOne(UUID.fromString(contractId))
+        return contractsService.getOne(UUID.fromString(contractId))
                 .map(ContractOutput::from)
-                .orElseThrow(() -> new NoSuchElementException("Contract does not exist."));
+                .orElseThrow(() -> new NoSuchElementException("Contrat non trouvé."));
     }
 
     /**
@@ -59,8 +59,8 @@ public class ContractsController {
      */
     @GetMapping(value = "/by-client/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Collection<ContractOutput> getByClient(@PathVariable final String clientId) {
-        return service.getByClient(UUID.fromString(clientId))
+    public Collection<ContractOutput> getByClientId(@PathVariable final String clientId) {
+        return contractsService.getByClient(UUID.fromString(clientId))
                 .stream()
                 .map(ContractOutput::from)
                 .collect(Collectors.toList());
@@ -71,8 +71,8 @@ public class ContractsController {
      */
     @GetMapping(value = "/by-vehicle/{vehicleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Collection<ContractOutput> getByVehicle(@PathVariable final String vehicleId) {
-        return service.getByVehicle(UUID.fromString(vehicleId))
+    public Collection<ContractOutput> getByVehicleId(@PathVariable final String vehicleId) {
+        return contractsService.getByVehicle(UUID.fromString(vehicleId))
                 .stream()
                 .map(ContractOutput::from)
                 .collect(Collectors.toList());
@@ -84,7 +84,7 @@ public class ContractsController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ContractOutput create(@RequestBody final ContractInput input) throws ImtException {
-        return ContractOutput.from(service.create(ContractInput.convert(input)));
+        return ContractOutput.from(contractsService.create(ContractInput.convert(input)));
     }
 
     /**
@@ -92,12 +92,11 @@ public class ContractsController {
      */
     @PatchMapping(value = "/{contractId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable final String contractId,
-                       @RequestBody final ContractUpdateInput input) throws ImtException {
-        service.update(
-                service.getOne(UUID.fromString(contractId))
+    public void update(@PathVariable final String contractId, @RequestBody final ContractUpdateInput input) throws ImtException {
+        contractsService.update(
+                contractsService.getOne(UUID.fromString(contractId))
                         .map(existing -> ContractUpdateInput.from(input, existing))
-                        .orElseThrow(() -> new NoSuchElementException("Contract does not exist."))
+                        .orElseThrow(() -> new NoSuchElementException("Contrat non trouvé."))
         );
     }
 
@@ -107,7 +106,7 @@ public class ContractsController {
     @DeleteMapping(value = "/{contractId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable final String contractId) throws ImtException {
-        service.delete(UUID.fromString(contractId));
+        contractsService.delete(UUID.fromString(contractId));
     }
 }
 

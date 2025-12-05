@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "vehicles")
+@Document(collection = "vehicle")
 public class VehicleEntity {
     @Id
     private String id;

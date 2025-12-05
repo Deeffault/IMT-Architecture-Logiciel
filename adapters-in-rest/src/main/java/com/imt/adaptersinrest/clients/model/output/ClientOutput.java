@@ -21,7 +21,7 @@ public class ClientOutput extends AbstractOutput {
     private final String firstName;
     private final LocalDate dateOfBirth;
     private final String licenseNumber;
-    private final String adress;
+    private final String address;
 
     // Domain --> DTO
     public static ClientOutput from(final Client client) {
@@ -31,7 +31,7 @@ public class ClientOutput extends AbstractOutput {
                 .firstName(client.getFirstName())
                 .dateOfBirth(client.getDateOfBirth())
                 .licenseNumber(client.getLicenseNumber())
-                .adress(client.getAdress())
+                .address(client.getAddress())
                 .build();
     }
 }

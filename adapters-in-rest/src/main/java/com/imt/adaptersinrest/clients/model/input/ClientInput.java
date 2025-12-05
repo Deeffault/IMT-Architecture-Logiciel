@@ -40,9 +40,9 @@ public class ClientInput extends AbstractInput {
     @Pattern(regexp = "^[A-Z0-9]{1,15}$", message = "License number pattern is invalid")
     private String licenseNumber;
 
-    @NotNull(message = "Adress cannot be null")
-    @Size(min = 5, max = 255, message = "Adress must be between 5 and 255 characters")
-    private String adress;
+    @NotNull(message = "Address cannot be null")
+    @Size(min = 5, max = 255, message = "Address must be between 5 and 255 characters")
+    private String address;
 
     // Conversion DTO --> Domain
     public static Client convert(final ClientInput input) {
@@ -51,7 +51,7 @@ public class ClientInput extends AbstractInput {
                 .firstName(input.getFirstName())
                 .dateOfBirth(input.getDateOfBirth())
                 .licenseNumber(input.getLicenseNumber())
-                .adress(input.getAdress())
+                .address(input.getAddress())
                 .build();
     }
 }

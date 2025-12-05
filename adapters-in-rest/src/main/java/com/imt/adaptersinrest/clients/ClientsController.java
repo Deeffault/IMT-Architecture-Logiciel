@@ -26,15 +26,13 @@ public class ClientsController {
     private final ClientsServiceValidator clientsServiceValidator;
     private final ClientsService clientsService;
 
-    public ClientsController(
-            ClientsServiceValidator clientsServiceValidator,
-            ClientsService clientsService) {
+    public ClientsController(ClientsServiceValidator clientsServiceValidator, ClientsService clientsService){
         this.clientsServiceValidator = clientsServiceValidator;
         this.clientsService = clientsService;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientOutput> createClient(@Valid @RequestBody ClientInput clientInput)
+    public ResponseEntity<ClientOutput> create(@Valid @RequestBody ClientInput clientInput)
             throws ImtException {
         // Utilisation de ClientInput.convert
         return new ResponseEntity<>(
@@ -44,7 +42,7 @@ public class ClientsController {
     }
 
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientOutput> updateClient(
+    public ResponseEntity<ClientOutput> update(
             @PathVariable String id,
             @RequestBody ClientUpdateInput clientUpdateInput
     ) throws ImtException {
@@ -62,7 +60,7 @@ public class ClientsController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientOutput> getClientById(@PathVariable String id) throws ImtException {
+    public ResponseEntity<ClientOutput> getById(@PathVariable String id) throws ImtException {
         return ResponseEntity.ok(
                 clientsService.getOne(id)
                         .map(ClientOutput::from) // Utilisation de ClientOutput::from
@@ -71,16 +69,16 @@ public class ClientsController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<ClientOutput>> getAllClients() {
-        Collection<ClientOutput> dtos = clientsService.getAll().stream()
+    public ResponseEntity<Collection<ClientOutput>> getAll() {
+        Collection<ClientOutput> dtos = clientsService.getAll()
+                .stream()
                 .map(ClientOutput::from) // Utilisation de ClientOutput::from
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteClient(@PathVariable String id) throws ImtException {
+    public ResponseEntity<Void> delete(@PathVariable String id) throws ImtException {
         clientsService.delete(id);
         return ResponseEntity.noContent().build();
     }

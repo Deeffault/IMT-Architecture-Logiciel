@@ -44,7 +44,7 @@ class ClientsServiceValidatorTest {
                 .firstName("User")
                 .dateOfBirth(LocalDate.of(2000, 1, 1))
                 .licenseNumber("010203040506123")
-                .adress("123 Rue Test")
+                .address("123 Rue Test")
                 .build();
 
         // Mock des vérifications d'unicité (rien n'existe)
@@ -76,7 +76,7 @@ class ClientsServiceValidatorTest {
                 .firstName("User")
                 .dateOfBirth(LocalDate.of(2000, 1, 1))
                 .licenseNumber(existingLicense)
-                .adress("123 Rue Test")
+                .address("123 Rue Test")
                 .build();
 
         // Mock : On dit "Si on cherche '010203040506123', on trouve quelqu'un"
@@ -103,7 +103,7 @@ class ClientsServiceValidatorTest {
                 .firstName("Name")
                 .dateOfBirth(LocalDate.of(1990, 1, 1))
                 .licenseNumber("010203040506") // Format valide 12 chiffres
-                .adress("New Adress")
+                .address("New Adress")
                 .build();
 
         // Mock: Unicité OK (soit empty, soit le même client trouvé)
@@ -135,7 +135,7 @@ class ClientsServiceValidatorTest {
                 .firstName("Me")
                 .dateOfBirth(LocalDate.EPOCH)
                 .licenseNumber(conflictLicense)
-                .adress("Address")
+                .address("Address")
                 .build();
 
         // Mock : On trouve un client en base avec ce permis, mais c'est un AUTRE (otherId)

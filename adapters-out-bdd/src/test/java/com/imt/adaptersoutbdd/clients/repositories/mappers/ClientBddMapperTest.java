@@ -45,7 +45,7 @@ class ClientBddMapperTest {
         assertEquals("John", result.getFirstName());
         assertEquals(LocalDate.of(1990, 1, 1), result.getDateOfBirth());
         assertEquals("AB123CD", result.getLicenseNumber());
-        assertEquals("1 Rue de la Paix", result.getAdress());
+        assertEquals("1 Rue de la Paix", result.getAddress());
     }
 
     @Test
@@ -64,7 +64,7 @@ class ClientBddMapperTest {
                 .firstName("Alice")
                 .dateOfBirth(LocalDate.of(1985, 5, 20))
                 .licenseNumber("XY987ZT")
-                .adress("10 Avenue Foch")
+                .address("10 Avenue Foch")
                 .build();
 
         // When
