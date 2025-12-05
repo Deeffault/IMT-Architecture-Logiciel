@@ -7,6 +7,8 @@ import com.imt.vehicle.VehicleStorageProvider;
 import com.imt.vehicle.model.Vehicle;
 import lombok.AllArgsConstructor;
 
+import java.util.Optional;
+
 @AllArgsConstructor
 public class VehicleAlreadyExistValidatorStep extends AbstractValidatorStep<Vehicle> {
 
@@ -14,17 +16,14 @@ public class VehicleAlreadyExistValidatorStep extends AbstractValidatorStep<Vehi
 
     @Override
     public void check(final Vehicle toValidate) throws ImtException {
-        this.service.getByLicensePlate(toValidate.getLicensePlate())
-                .ifPresent(existingVehicle -> {
-                    if (!existingVehicle.getId().equals(toValidate.getId())) {
-                        try {
-                            throw new ConflictException(
-                                    String.format("Un véhicule avec la plaque d'immatriculation '%s' existe déjà.", toValidate.getLicensePlate())
-                            );
-                        } catch (ConflictException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
+        Optional<Vehicle> existingVehicleOpt = this.service.getByLicensePlate(toValidate.getLicensePlate());
+        if (existingVehicleOpt.isPresent()) {
+            Vehicle existingVehicle = existingVehicleOpt.get();
+            if (!existingVehicle.getId().equals(toValidate.getId())) {
+                throw new ConflictException(
+                        String.format("Un véhicule avec la plaque d'immatriculation '%s' existe déjà.", toValidate.getLicensePlate())
+                );
+            }
+        }
     }
 }
