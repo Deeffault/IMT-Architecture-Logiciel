@@ -18,7 +18,7 @@ public class ClientBddMapper extends AbstractBddMapper<Client, ClientEntity> {
                 .lastName(input.getLastName())
                 .dateOfBirth(input.getDateOfBirth())
                 .licenseNumber(input.getLicenseNumber())
-                .adress(input.getAddress())
+                .address(input.getAddress())
                 .build();
     }
 
@@ -32,7 +32,7 @@ public class ClientBddMapper extends AbstractBddMapper<Client, ClientEntity> {
         entity.setLastName(object.getLastName());
         entity.setDateOfBirth(object.getDateOfBirth());
         entity.setLicenseNumber(object.getLicenseNumber());
-        entity.setAddress(object.getAdress());
+        entity.setAddress(object.getAddress());
         return entity;
     }
 }

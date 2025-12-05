@@ -44,7 +44,7 @@ public class Client {
     @Pattern(regexp = LICENSE_NUMBER_PATTERN, message = "License number must be between 1 and 15 alphanumeric characters")
     private String licenseNumber;
 
-    @NotNull(message = "Adress cannot be null")
-    @Size(min = 5, max = 255, message = "Adress must be between 5 and 255 characters")
-    private String adress;
+    @NotNull(message = "Address cannot be null")
+    @Size(min = 5, max = 255, message = "Address must be between 5 and 255 characters")
+    private String address;
 }

@@ -54,7 +54,7 @@ class ClientsControllerTest {
         clientInput.setFirstName("Jean");
         clientInput.setDateOfBirth(LocalDate.of(1990, 1, 1));
         clientInput.setLicenseNumber("AB123CD");
-        clientInput.setAdress("Paris");
+        clientInput.setAddress("Paris");
 
         clientDomain = Client.builder()
                 .id(clientId)
@@ -62,7 +62,7 @@ class ClientsControllerTest {
                 .firstName("Jean")
                 .dateOfBirth(LocalDate.of(1990, 1, 1))
                 .licenseNumber("AB123CD")
-                .adress("Paris")
+                .address("Paris")
                 .build();
     }
 
