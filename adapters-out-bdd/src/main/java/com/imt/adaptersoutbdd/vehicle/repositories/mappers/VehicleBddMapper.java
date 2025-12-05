@@ -5,6 +5,8 @@ import com.imt.adaptersoutbdd.vehicle.repositories.entities.VehicleEntity;
 import com.imt.vehicle.model.Vehicle;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class VehicleBddMapper extends AbstractBddMapper<Vehicle, VehicleEntity> {
     @Override
@@ -12,6 +14,7 @@ public class VehicleBddMapper extends AbstractBddMapper<Vehicle, VehicleEntity> 
         if (input == null) return null;
 
         return Vehicle.builder()
+                .id(UUID.fromString(input.getId()))
                 .licensePlate(input.getLicensePlate())
                 .brand(input.getBrand())
                 .model(input.getModel())
@@ -27,6 +30,7 @@ public class VehicleBddMapper extends AbstractBddMapper<Vehicle, VehicleEntity> 
         if (object == null) return null;
 
         return VehicleEntity.builder()
+                .id(object.getId().toString())
                 .licensePlate(object.getLicensePlate())
                 .brand(object.getBrand())
                 .model(object.getModel())

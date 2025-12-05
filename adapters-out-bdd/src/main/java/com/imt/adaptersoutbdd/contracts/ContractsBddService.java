@@ -4,6 +4,7 @@ import com.imt.adaptersoutbdd.contracts.repositories.ContractRepository;
 import com.imt.adaptersoutbdd.contracts.repositories.mappers.ContractBddMapper;
 import com.imt.contracts.ContractStorageProvider;
 import com.imt.contracts.model.Contract;
+import com.imt.contracts.model.ContractStateEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +97,24 @@ public class ContractsBddService implements ContractStorageProvider {
         Optional.ofNullable(identifier)
                 .map(UUID::toString)
                 .ifPresent(contractRepository::deleteById);
+    }
+
+    @Override
+    public Collection<Contract> findOverdueContracts(LocalDate referenceDate) {
+        // On cherche ceux qui sont "EN COURS" mais dont la date de fin est dépassée
+        return contractRepository.findByStateAndEndDateBefore(ContractStateEnum.IN_PROGRESS, referenceDate)
+                .stream()
+                .map(contractBddMapper::from)
+                .toList();
+    }
+
+    @Override
+    public Collection<Contract> findPendingContractsByVehicleId(UUID vehicleId) {
+        // On cherche ceux qui sont "EN ATTENTE" pour ce véhicule
+        return contractRepository.findByVehicleIdAndState(vehicleId.toString(), ContractStateEnum.PENDING)
+                .stream()
+                .map(contractBddMapper::from)
+                .toList();
     }
 }
 
