@@ -5,15 +5,15 @@ import com.imt.adaptersinrest.common.model.input.UpdatableProperty;
 import com.imt.vehicle.model.EngineTypeEnum;
 import com.imt.vehicle.model.Vehicle;
 import com.imt.vehicle.model.VehicleStateEnum;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serial;
 import java.time.LocalDate;
-
+/**
+ * DTO pour la mise à jour partielle (PATCH) d'un véhicule.
+ */
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @ToString

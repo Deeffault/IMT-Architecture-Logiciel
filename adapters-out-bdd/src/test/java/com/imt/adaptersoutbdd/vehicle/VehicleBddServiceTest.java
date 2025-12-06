@@ -3,7 +3,9 @@ package com.imt.adaptersoutbdd.vehicle;
 import com.imt.adaptersoutbdd.vehicle.repositories.VehicleRepository;
 import com.imt.adaptersoutbdd.vehicle.repositories.entities.VehicleEntity;
 import com.imt.adaptersoutbdd.vehicle.repositories.mappers.VehicleBddMapper;
+import com.imt.vehicle.model.EngineTypeEnum;
 import com.imt.vehicle.model.Vehicle;
+import com.imt.vehicle.model.VehicleStateEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,13 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,88 +35,170 @@ class VehicleBddServiceTest {
     @InjectMocks
     private VehicleBddService service;
 
-    private final String testId = "veh-123";
-    private Vehicle testVehicle;
-    private VehicleEntity testVehicleEntity;
+    private Vehicle vehicle;
+    private VehicleEntity vehicleEntity;
+    private final String vehicleId = "veh-123";
+    private final String licensePlate = "AA-123-BB";
 
     @BeforeEach
     void setUp() {
-        testVehicle = Vehicle.builder().id(testId).brand("Toyota").model("Corolla").build();
-        testVehicleEntity = VehicleEntity.builder().id(testId).brand("Toyota").model("Corolla").build();
+        LocalDate acquisitionDate = LocalDate.of(2023, 1, 1);
+
+        vehicle = Vehicle.builder()
+                .id(vehicleId)
+                .licensePlate(licensePlate)
+                .brand("Renault")
+                .model("Clio")
+                .engineType(EngineTypeEnum.GASOLINE)
+                .color("Blue")
+                .acquisitionDate(acquisitionDate)
+                .state(VehicleStateEnum.AVAILABLE)
+                .build();
+
+        vehicleEntity = VehicleEntity.builder()
+                .id(vehicleId)
+                .licensePlate(licensePlate)
+                .brand("Renault")
+                .model("Clio")
+                .engineType(EngineTypeEnum.GASOLINE)
+                .color("Blue")
+                .acquisitionDate(acquisitionDate)
+                .state(VehicleStateEnum.AVAILABLE)
+                .build();
     }
 
     @Test
-    @DisplayName("exist() - Vérifie l'appel au repository")
-    void exist_shouldReturnTrue_whenVehicleExists() {
-        when(repository.existsById(testId)).thenReturn(true);
+    @DisplayName("getAll() - Doit retourner tous les véhicules mappés")
+    void getAll_shouldReturnAllMappedVehicles() {
+        // Given
+        when(repository.findAll()).thenReturn(List.of(vehicleEntity));
+        when(mapper.from(vehicleEntity)).thenReturn(vehicle);
 
-        boolean result = service.exist(testId);
-
-        assertTrue(result);
-        verify(repository).existsById(testId);
-    }
-
-    @Test
-    @DisplayName("getAll() - Retourne tous les véhicules mappés")
-    void getAll_shouldReturnAllVehicles() {
-        when(repository.findAll()).thenReturn(List.of(testVehicleEntity));
-        when(mapper.from(testVehicleEntity)).thenReturn(testVehicle);
-
+        // When
         Collection<Vehicle> result = service.getAll();
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertTrue(result.contains(testVehicle));
+        // Then
+        assertThat(result).isNotNull().hasSize(1).containsExactly(vehicle);
         verify(repository).findAll();
+        verify(mapper).from(vehicleEntity);
     }
 
     @Test
-    @DisplayName("get() - Retourne le véhicule mappé si trouvé")
+    @DisplayName("getAll() - Doit retourner une liste vide si aucun véhicule n'est trouvé")
+    void getAll_shouldReturnEmptyList_whenNoVehicles() {
+        // Given
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+
+        // When
+        Collection<Vehicle> result = service.getAll();
+
+        // Then
+        assertThat(result).isNotNull().isEmpty();
+        verify(repository).findAll();
+        verifyNoInteractions(mapper);
+    }
+
+    @Test
+    @DisplayName("get() - Doit retourner le véhicule mappé si trouvé")
     void get_shouldReturnVehicle_whenFound() {
-        when(repository.findById(testId)).thenReturn(Optional.of(testVehicleEntity));
-        when(mapper.from(testVehicleEntity)).thenReturn(testVehicle);
+        // Given
+        when(repository.findById(vehicleId)).thenReturn(Optional.of(vehicleEntity));
+        when(mapper.from(vehicleEntity)).thenReturn(vehicle);
 
-        Optional<Vehicle> result = service.get(testId);
+        // When
+        Optional<Vehicle> result = service.get(vehicleId);
 
-        assertTrue(result.isPresent());
-        assertEquals(testVehicle, result.get());
+        // Then
+        assertThat(result).isPresent().contains(vehicle);
+        verify(repository).findById(vehicleId);
+        verify(mapper).from(vehicleEntity);
     }
 
     @Test
-    @DisplayName("save() - Sauvegarde l'entité et retourne le véhicule")
+    @DisplayName("get() - Doit retourner un Optional vide si non trouvé")
+    void get_shouldReturnEmpty_whenNotFound() {
+        // Given
+        when(repository.findById(vehicleId)).thenReturn(Optional.empty());
+
+        // When
+        Optional<Vehicle> result = service.get(vehicleId);
+
+        // Then
+        assertThat(result).isEmpty();
+        verify(repository).findById(vehicleId);
+        verifyNoInteractions(mapper);
+    }
+
+    @Test
+    @DisplayName("getByLicensePlate() - Doit retourner le véhicule mappé si trouvé")
+    void getByLicensePlate_shouldReturnVehicle_whenFound() {
+        // Given
+        when(repository.findByLicensePlate(licensePlate)).thenReturn(Optional.of(vehicleEntity));
+        when(mapper.from(vehicleEntity)).thenReturn(vehicle);
+
+        // When
+        Optional<Vehicle> result = service.getByLicensePlate(licensePlate);
+
+        // Then
+        assertThat(result).isPresent().contains(vehicle);
+        verify(repository).findByLicensePlate(licensePlate);
+        verify(mapper).from(vehicleEntity);
+    }
+
+    @Test
+    @DisplayName("getByLicensePlate() - Doit retourner un Optional vide si non trouvé")
+    void getByLicensePlate_shouldReturnEmpty_whenNotFound() {
+        // Given
+        when(repository.findByLicensePlate(licensePlate)).thenReturn(Optional.empty());
+
+        // When
+        Optional<Vehicle> result = service.getByLicensePlate(licensePlate);
+
+        // Then
+        assertThat(result).isEmpty();
+        verify(repository).findByLicensePlate(licensePlate);
+        verifyNoInteractions(mapper);
+    }
+
+    @Test
+    @DisplayName("save() - Doit mapper, sauvegarder et retourner le véhicule mappé")
     void save_shouldSaveAndReturnVehicle() {
-        when(mapper.to(testVehicle)).thenReturn(testVehicleEntity);
-        when(repository.save(testVehicleEntity)).thenReturn(testVehicleEntity);
-        when(mapper.from(testVehicleEntity)).thenReturn(testVehicle);
+        // Given
+        when(mapper.to(vehicle)).thenReturn(vehicleEntity);
+        when(repository.save(vehicleEntity)).thenReturn(vehicleEntity);
+        when(mapper.from(vehicleEntity)).thenReturn(vehicle);
 
-        Vehicle result = service.save(testVehicle);
+        // When
+        Vehicle result = service.save(vehicle);
 
-        assertNotNull(result);
-        assertEquals(testVehicle, result);
-        verify(mapper).to(testVehicle);
-        verify(repository).save(testVehicleEntity);
-        verify(mapper).from(testVehicleEntity);
+        // Then
+        assertThat(result).isNotNull().isEqualTo(vehicle);
+        verify(mapper).to(vehicle);
+        verify(repository).save(vehicleEntity);
+        verify(mapper).from(vehicleEntity);
     }
 
     @Test
-    @DisplayName("delete() - doit appeler le delete du repository")
-    void delete_shouldCallRepository() {
-        service.delete(testId);
-        verify(repository).deleteById(testId);
+    @DisplayName("delete() - Doit appeler la méthode delete du repository")
+    void delete_shouldCallRepositoryDelete() {
+        // When
+        service.delete(vehicleId);
+
+        // Then
+        verify(repository).deleteById(vehicleId);
     }
 
     @Test
-    @DisplayName("findByLicencePlate() - doit retouner le véhicule mappé si trouvé")
-    void findByLicencePlate_shouldCallRepo() {
-        String licencePlate = "AB-123-CD";
-        when(repository.findByLicensePlate(licencePlate)).thenReturn(Optional.of(testVehicleEntity));
-        when(mapper.from(testVehicleEntity)).thenReturn(testVehicle);
+    @DisplayName("exist() - Doit appeler la méthode existsById du repository")
+    void exist_shouldCallRepositoryExists() {
+        // Given
+        when(repository.existsById(vehicleId)).thenReturn(true);
 
-        Optional<Vehicle> result = service.getByLicensePlate(licencePlate);
+        // When
+        boolean result = service.exist(vehicleId);
 
-        assertTrue(result.isPresent());
-        assertEquals(testVehicle, result.get());
-        verify(repository).findByLicensePlate(licencePlate);
-        verify(mapper).from(testVehicleEntity);
+        // Then
+        assertThat(result).isTrue();
+        verify(repository).existsById(vehicleId);
     }
 }
