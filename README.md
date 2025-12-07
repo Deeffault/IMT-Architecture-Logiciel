@@ -15,17 +15,41 @@ L'objectif est de mettre en œuvre une **Architecture Hexagonale (Ports & Adapte
 
 ---
 
+## 📖 Contexte du Projet
+
+Ce projet a été développé suite à l'obtention du budget pour la refonte du système de gestion des locations automobiles ("BFB").
+
+**Le besoin métier :**
+L'objectif est de gérer trois entités principales : **Clients**, **Véhicules** et **Contrats**. Le système doit respecter des règles métier strictes définies par la direction :
+- Unicité des clients et des véhicules.
+- Gestion des états de véhicules (Disponible, En location, En panne).
+- Annulation automatique des contrats si un véhicule tombe en panne.
+- Gestion des retards et annulations en cascade pour les locations suivantes.
+
+**Le défi technique :**
+Le comité d'architecture a imposé une contrainte forte : **"Apporter un soin particulier à l'architecture de l'application"**. Pour répondre à cette exigence et garantir la maintenabilité, nous avons opté pour une **Architecture Hexagonale (Ports & Adapters)** stricte, isolant totalement le code métier des frameworks.
+
+---
+
 ## 📑 Table des matières
 
-1. [Fonctionnalités principales](#-fonctionnalités-principales)
-2. [Architecture Hexagonale](#-architecture--hexagonale-ports--adapters)
-3. [Pourquoi l'Architecture Hexagonale ?](#-pourquoi-larchitecture-hexagonale-)
-4. [Design Patterns utilisés](#-design-patterns-utilisés)
-5. [Structure des modules](#-structure-des-modules)
-6. [Choix technologiques](#-choix-technologiques)
-7. [Démarrage rapide](#-démarrage-rapide)
-8. [API Endpoints](#-api-endpoints)
-9. [Tests](#-tests)
+1. [Contexte du Projet](#-contexte-du-projet)
+2. [Fonctionnalités principales](#-fonctionnalités-principales)
+3. [Architecture Hexagonale](#%EF%B8%8F-architecture--hexagonale-ports--adapters)
+4. [Pourquoi l'Architecture Hexagonale ?](#-pourquoi-larchitecture-hexagonale-)
+5. [Design Patterns utilisés](#-design-patterns-utilisés)
+   - [Chain of Responsibility](#1--chain-of-responsibility-validation)
+   - [Ports & Adapters](#2--ports--adapters-hexagonal-architecture)
+   - [Builder Pattern](#3--builder-pattern-modèles-immuables)
+   - [Mapper Pattern](#4-%EF%B8%8F-mapper-pattern-dto--domain--entity)
+   - [Decorator Pattern](#5--decorator-pattern-services-avec-validation)
+   - [Dependency Injection](#6-%EF%B8%8F-dependency-injection-configuration-spring)
+   - [Proxy Pattern](#7--proxy-pattern-abstraction-de-la-persistance)
+6. [Structure des modules](#-structure-des-modules)
+7. [Choix technologiques](#-choix-technologiques)
+8. [Démarrage rapide](#-démarrage-rapide)
+9. [API Endpoints](#-api-endpoints)
+10. [Tests](#-tests)
 
 ---
 
@@ -413,13 +437,15 @@ public class ClientBddMapper extends AbstractBddMapper<Client, ClientEntity> {
 
 ---
 
-### 5. 🎛️ Template Method Pattern (Services)
+### 5. 🎭 Decorator Pattern (Services avec validation)
 
 **Localisation** : `domain/src/main/java/com/imt/*/`
 
+**Problème résolu** : Ajouter dynamiquement des responsabilités (validation) à un objet sans modifier son code original.
+
 **Implémentation** :
 ```java
-// Service de base avec opérations CRUD
+// Service de base (Component concret)
 public class ClientsService {
     protected ClientStorageProvider service;
     
@@ -428,20 +454,33 @@ public class ClientsService {
     }
 }
 
-// Extension avec validation
+// Décorateur qui ajoute la validation
 public class ClientsServiceValidator extends ClientsService {
-    @Override
+    
     public Client create(final Client client) throws ImtException {
-        // Étape ajoutée : validation
+        // 🎨 DÉCORATION : Ajout de comportement AVANT
         new ConstraintValidatorStep<Client>()
             .linkWith(new ClientUnicityValidatorStep(service))
+            .linkWith(new ClientUnicityLicenseValidatorStep(service))
             .validate(client)
             .throwIfInvalid();
         
-        return super.create(client);  // Appel au parent
+        // Délégation au composant de base
+        return super.create(client);
     }
 }
 ```
+
+**Pourquoi c'est un Decorator et non un Template Method ?**
+- **Template Method** : La classe parente définit un squelette d'algorithme avec des "hooks" abstraits que les sous-classes implémentent.
+- **Decorator** : La sous-classe **enveloppe** le comportement existant en ajoutant des responsabilités avant/après l'appel au parent.
+
+Ici, `ClientsServiceValidator` **décore** `ClientsService` en ajoutant une couche de validation tout en préservant l'interface originale.
+
+**Avantages** :
+- ✅ Séparation des préoccupations (CRUD vs Validation)
+- ✅ Possibilité d'utiliser `ClientsService` sans validation si besoin
+- ✅ Composition de décorateurs possible
 
 ---
 
@@ -470,6 +509,78 @@ public class BeanConfiguration {
     }
 }
 ```
+
+---
+
+### 7. 🔀 Proxy Pattern (Abstraction de la persistance)
+
+**Localisation** : 
+- Interface : `domain/src/main/java/com/imt/clients/ClientStorageProvider.java`
+- Implémentation : `adapters-out-bdd/src/main/java/com/imt/adaptersoutbdd/clients/ClientsBddService.java`
+
+**Problème résolu** : Permettre au domaine d'accéder à la persistance sans connaître l'implémentation concrète (MongoDB, PostgreSQL, mémoire...).
+
+**Implémentation** :
+```java
+// Interface Proxy (dans le Domain)
+public interface ClientStorageProvider {
+    Client save(Client client);
+    Optional<Client> get(String id);
+    Collection<Client> getAll();
+    void delete(String id);
+    // ...
+}
+
+// Sujet Réel (dans adapters-out-bdd) - Le "vrai" accès aux données
+@Service
+public class ClientsBddService implements ClientStorageProvider {
+    
+    private final ClientRepository repository;  // MongoDB
+    private final ClientBddMapper mapper;
+    
+    @Override
+    public Client save(Client client) {
+        // Conversion Domain → Entity
+        ClientEntity entity = mapper.to(client);
+        // Accès réel à MongoDB
+        ClientEntity saved = repository.save(entity);
+        // Conversion Entity → Domain
+        return mapper.from(saved);
+    }
+    
+    @Override
+    public Optional<Client> get(String id) {
+        return repository.findById(id)
+                .map(mapper::from);
+    }
+}
+```
+
+**Flux avec le Proxy** :
+```plaintext
+Domain                          Proxy Interface                  Implémentation Réelle
+┌───────────────┐              ┌───────────────────┐             ┌───────────────────┐
+│ClientsService │ ──────────►  │ClientStorageProvider│ ────────► │ ClientsBddService │
+│               │   appelle    │   (Interface)     │   délègue   │   (MongoDB)       │
+└───────────────┘              └───────────────────┘             └───────────────────┘
+                                                                          │
+                                                                          ▼
+                                                                 ┌───────────────────┐
+                                                                 │  ClientRepository │
+                                                                 │ (MongoRepository) │
+                                                                 └───────────────────┘
+```
+
+**Pourquoi c'est un Proxy ?**
+- Le domaine utilise `ClientStorageProvider` comme s'il accédait directement aux données
+- En réalité, l'interface **intercepte** les appels et les **délègue** à l'implémentation concrète
+- Le domaine ne sait pas (et n'a pas besoin de savoir) si les données viennent de MongoDB, PostgreSQL ou d'un mock en mémoire
+
+**Avantages** :
+- ✅ **Découplage total** : Le domaine ne dépend pas de la technologie de persistance
+- ✅ **Interchangeabilité** : Changer de BDD = créer une nouvelle implémentation du proxy
+- ✅ **Testabilité** : Facile de créer un mock/stub pour les tests unitaires
+- ✅ **Lazy loading possible** : Le proxy peut différer le chargement réel des données
 
 ---
 
@@ -607,6 +718,29 @@ IMT-Architecture-Logiciel/
                     │   (Aucune dép. ext) │
                     └─────────────────────┘
 ```
+
+---
+
+## 🏗️ Architecture Logicielle
+
+L'application est structurée en **multi-modules Maven** pour forcer physiquement le respect de l'architecture hexagonale.
+
+### 1. Le Noyau (Core Domain) - `domain`
+C'est le cœur de l'application. Il contient la logique métier pure et ne dépend d'aucun framework (pas de Spring, pas de Mongo).
+- **Modèles** : Objets riches (`Client`, `Vehicle`, `Contract`).
+- **Ports (Interfaces)** : Définissent comment le domaine communique avec l'extérieur (ex: `ClientStorageProvider`).
+- **Services** : Orchestration de la logique (`ClientsService`).
+
+### 2. Les Adaptateurs (Adapters)
+Ils font le lien entre le monde extérieur et le domaine.
+- **Adapters-IN (Primaires)** : Pilotent l'application.
+    - `adapters-in-rest` : Contrôleurs REST exposant l'API.
+    - `adapters-in-scheduler` : Tâches planifiées (Batchs) pour la détection des retards.
+- **Adapters-OUT (Secondaires)** : Pilotés par l'application.
+    - `adapters-out-bdd` : Implémentation de la persistance avec MongoDB.
+
+### 3. L'Assemblage - `application`
+Le point d'entrée (`Main`) qui configure Spring Boot, scanne les modules et injecte les dépendances (Inversion de contrôle).
 
 ---
 
