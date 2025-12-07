@@ -144,7 +144,7 @@ class ContractsControllerTest {
             // When & Then
             assertThatThrownBy(() -> controller.update(contractId.toString(), updateInput))
                     .isInstanceOf(NoSuchElementException.class)
-                    .hasMessageContaining("Contract does not exist");
+                    .hasMessageContaining("Contrat non trouvé.");
 
             verify(contractsServiceValidator, never()).update(any(Contract.class));
         }
@@ -178,7 +178,7 @@ class ContractsControllerTest {
             // When & Then
             assertThatThrownBy(() -> controller.getOne(contractId.toString()))
                     .isInstanceOf(NoSuchElementException.class)
-                    .hasMessageContaining("Contract does not exist");
+                    .hasMessageContaining("Contrat non trouvé.");
         }
     }
 
@@ -229,7 +229,7 @@ class ContractsControllerTest {
             when(contractsServiceValidator.getByClient(clientId)).thenReturn(contracts);
 
             // When
-            Collection<ContractOutput> response = controller.getByClient(clientId.toString());
+            Collection<ContractOutput> response = controller.getByClientId(clientId.toString());
 
             // Then
             assertThat(response).isNotNull();
@@ -250,7 +250,7 @@ class ContractsControllerTest {
             when(contractsServiceValidator.getByVehicle(vehicleId)).thenReturn(contracts);
 
             // When
-            Collection<ContractOutput> response = controller.getByVehicle(vehicleId.toString());
+            Collection<ContractOutput> response = controller.getByVehicleId(vehicleId.toString());
 
             // Then
             assertThat(response).isNotNull();
