@@ -3,9 +3,7 @@ package com.imt.adaptersinrest.contracts;
 import com.imt.adaptersinrest.contracts.model.input.ContractInput;
 import com.imt.adaptersinrest.contracts.model.input.ContractUpdateInput;
 import com.imt.adaptersinrest.contracts.model.output.ContractOutput;
-import com.imt.adaptersinrest.common.model.input.UpdatableProperty;
 import com.imt.common.exceptions.ImtException;
-import com.imt.contracts.ContractsService;
 import com.imt.contracts.ContractsServiceValidator;
 import com.imt.contracts.model.Contract;
 import com.imt.contracts.model.ContractStateEnum;
@@ -17,8 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.imt.common.exceptions.BadRequestException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -100,7 +97,7 @@ class ContractsControllerTest {
         @DisplayName("Doit propager l'exception si le service échoue")
         void shouldPropagateExceptionWhenServiceFails() throws ImtException {
             // Given
-            doThrow(new ImtException("Erreur de validation"))
+            doThrow(new BadRequestException("Erreur de validation"))
                     .when(contractsServiceValidator).create(any(Contract.class));
 
             // When & Then
