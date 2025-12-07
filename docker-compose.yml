@@ -3,7 +3,8 @@ services:
   app:
     # Construit l'image à partir du Dockerfile local
     build: .
-    container_name: location-app
+    # Nom du conteneur demandé
+    container_name: IMT-ArchitectureLogicielle-app
     ports:
       # Mappe le port 8080 de ta machine au port 8080 du conteneur
       - "8080:8080"
@@ -19,7 +20,8 @@ services:
   # Service 2 : La base de données MongoDB
   db:
     image: mongo
-    container_name: location-mongodb
+    # Nom du conteneur demandé
+    container_name: IMT-ArchitectureLogicielle-db
     ports:
       # Mappe le port 27017 de ta machine à celui du conteneur
       - "27017:27017"
