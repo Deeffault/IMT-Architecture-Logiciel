@@ -962,6 +962,6 @@ Projet réalisé dans le cadre du TP d'Architecture Logicielle - IMT IMT Nord Eu
 ## 👥 Auteurs
 
 - Étudiants IMT Nord Europe - Promotion 27 :
-     -> Thomas DUBOT
-     -> Théo LEBIEZ
-     -> Axel ELIAS
+-> Thomas DUBOT
+-> Théo LEBIEZ
+-> Axel ELIAS
