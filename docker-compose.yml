@@ -2,7 +2,8 @@ services:
   # Service 1 : Ton application Spring Boot
   app:
     # Construit l'image à partir du Dockerfile local
-    build: .
+    # build: .
+    image: mon-app-metier:latest
     # Nom du conteneur demandé
     container_name: IMT-ArchitectureLogicielle-app
     ports:
