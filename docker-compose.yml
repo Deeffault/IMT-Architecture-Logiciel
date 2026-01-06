@@ -34,6 +34,10 @@ services:
       # Permet de garder les données même si tu arrêtes le conteneur
       - mongo-data:/data/db
 
+networks:
+  default:
+    name: cicd-network
+
 # Définit le volume pour la persistance des données
 volumes:
   mongo-data:
