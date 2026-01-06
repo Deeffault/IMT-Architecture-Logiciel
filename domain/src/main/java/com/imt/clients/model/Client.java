@@ -47,4 +47,7 @@ public class Client {
     @NotNull(message = "Address cannot be null")
     @Size(min = 5, max = 255, message = "Address must be between 5 and 255 characters")
     private String address;
+
+    // A enlever
+    ca va planter;
 }
