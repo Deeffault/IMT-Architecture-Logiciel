@@ -49,6 +49,6 @@ public class Client {
     private String address;
 
     // A enlever
-    ca va planter;
+    // ca va planter;
 
 }
